@@ -3,7 +3,7 @@
         class="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-12">
         <div class="w-full max-w-md">
             <!-- Logo/Brand Area -->
-            <div class="text-center mb-8">
+             <div class="text-center mb-8">
                 <div
                     class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl mb-4">
                     <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">

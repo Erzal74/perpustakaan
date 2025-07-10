@@ -115,5 +115,5 @@
                 <p>© 2024 Knowledge Management System. All rights reserved.</p>
             </div>
         </div>
-    </div>
+     </div>
 </x-guest-layout>
