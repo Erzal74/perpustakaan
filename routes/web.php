@@ -29,7 +29,7 @@ Route::middleware('auth')->get('/redirect', function () {
     return match ($user->role) {
         'superadmin' => redirect()->route('superadmin.dashboard'),
         'admin'      => redirect()->route('admin.dashboard'),
-        'user'       => redirect()->route('user.dashboard'),
+        'user'       => redirect()->route('user.index'),
         default      => abort(403, 'Role tidak dikenali.'),
     };
 })->name('redirect');
