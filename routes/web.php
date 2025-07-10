@@ -28,7 +28,7 @@ Route::middleware('auth')->get('/redirect', function () {
 
     return match ($user->role) {
         'superadmin' => redirect()->route('superadmin.dashboard'),
-        'admin'      => redirect()->route('admin.dashboard'),
+        'admin'      => redirect()->route('admin.index'),
         'user'       => redirect()->route('user.index'),
         default      => abort(403, 'Role tidak dikenali.'),
     };
@@ -77,4 +77,5 @@ Route::middleware(['auth', 'role:user'])->prefix('dashboard/user')->name('user.'
     Route::get('/preview/{softfile}', [UserController::class, 'show'])->name('preview');
     Route::get('/download/{softfile}', [UserController::class, 'download'])->name('download');
     Route::get('/search', [UserController::class, 'search'])->name('search');
+    
 });
