@@ -61,6 +61,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('dashboard/admin')->name('admi
     Route::get('/create', [AdminController::class, 'create'])->name('create');
     Route::post('/', [AdminController::class, 'store'])->name('store'); // Ubah dari /store ke /
     Route::get('/{softfile}/edit', [AdminController::class, 'edit'])->name('edit'); // Tambahkan /edit
+    Route::get('/admin/preview/{id}', [AdminController::class, 'preview'])->name('admin.preview');
     Route::put('/{softfile}', [AdminController::class, 'update'])->name('update'); // Hapus /update
     Route::delete('/{softfile}', [AdminController::class, 'destroy'])->name('destroy'); // Ubah dari delete ke destroy
 });
@@ -77,5 +78,9 @@ Route::middleware(['auth', 'role:user'])->prefix('dashboard/user')->name('user.'
     Route::get('/preview/{softfile}', [UserController::class, 'show'])->name('preview');
     Route::get('/download/{softfile}', [UserController::class, 'download'])->name('download');
     Route::get('/search', [UserController::class, 'search'])->name('search');
+<<<<<<< HEAD
     
 });
+=======
+});
+>>>>>>> 3d4d99f (aman ae)
