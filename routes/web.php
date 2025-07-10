@@ -73,7 +73,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('dashboard/admin')->name('admi
 | Role: user (lihat & download softfile)
 */
 Route::middleware(['auth', 'role:user'])->prefix('dashboard/user')->name('user.')->group(function () {
-    Route::get('/', [UserController::class, 'index'])->name('dashboard');
+    Route::get('/', [UserController::class, 'index'])->name('index'); // hanya ini yang dipakai
     Route::get('/preview/{softfile}', [UserController::class, 'show'])->name('preview');
     Route::get('/download/{softfile}', [UserController::class, 'download'])->name('download');
+    Route::get('/search', [UserController::class, 'search'])->name('search');
 });
