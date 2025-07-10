@@ -57,13 +57,14 @@ Route::middleware(['auth', 'role:superadmin'])->prefix('dashboard/superadmin')->
 | Role: admin (CRUD data softfile)
 */
 Route::middleware(['auth', 'role:admin'])->prefix('dashboard/admin')->name('admin.')->group(function () {
-    Route::get('/', [AdminController::class, 'index'])->name('dashboard');
+    Route::get('/', [AdminController::class, 'index'])->name('index'); // Ubah dari dashboard ke index
     Route::get('/create', [AdminController::class, 'create'])->name('create');
-    Route::post('/store', [AdminController::class, 'store'])->name('store');
-    Route::get('/edit/{softfile}', [AdminController::class, 'edit'])->name('edit');
-    Route::put('/update/{softfile}', [AdminController::class, 'update'])->name('update');
-    Route::delete('/delete/{softfile}', [AdminController::class, 'destroy'])->name('delete');
+    Route::post('/', [AdminController::class, 'store'])->name('store'); // Ubah dari /store ke /
+    Route::get('/{softfile}/edit', [AdminController::class, 'edit'])->name('edit'); // Tambahkan /edit
+    Route::put('/{softfile}', [AdminController::class, 'update'])->name('update'); // Hapus /update
+    Route::delete('/{softfile}', [AdminController::class, 'destroy'])->name('destroy'); // Ubah dari delete ke destroy
 });
+/*
 
 /*
 |--------------------------------------------------------------------------
