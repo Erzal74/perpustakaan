@@ -78,9 +78,4 @@ Route::middleware(['auth', 'role:user'])->prefix('dashboard/user')->name('user.'
     Route::get('/preview/{softfile}', [UserController::class, 'show'])->name('preview');
     Route::get('/download/{softfile}', [UserController::class, 'download'])->name('download');
     Route::get('/search', [UserController::class, 'search'])->name('search');
-<<<<<<< HEAD
-    
 });
-=======
-});
->>>>>>> 3d4d99f (aman ae)
