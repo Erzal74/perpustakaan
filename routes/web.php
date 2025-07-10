@@ -47,6 +47,7 @@ Route::middleware(['auth', 'role:superadmin'])->prefix('dashboard/superadmin')->
     Route::post('/approve/{id}', [SuperAdminController::class, 'approve'])->name('approve');
     Route::delete('/reject/{id}', [SuperAdminController::class, 'reject'])->name('reject');
     Route::post('/disable/{id}', [SuperAdminController::class, 'disable'])->name('disable');
+    Route::post('/enable/{id}', [SuperAdminController::class, 'enable'])->name('enable');
 });
 
 /*
