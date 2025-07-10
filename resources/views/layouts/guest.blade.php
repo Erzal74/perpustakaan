@@ -15,150 +15,153 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    <!-- Additional Styles for Modern Look -->
+    <!-- Simple and Clean Styles -->
     <style>
         body {
             font-family: 'Inter', sans-serif;
         }
 
-        .animated-bg {
-            background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #f5576c, #4facfe, #00f2fe);
-            background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
         }
 
-        @keyframes gradientShift {
-            0% {
-                background-position: 0% 50%;
+        .gradient-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.05) 50%, transparent 70%);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+
+            0%,
+            100% {
+                transform: translateX(-100%);
             }
 
             50% {
-                background-position: 100% 50%;
-            }
-
-            100% {
-                background-position: 0% 50%;
+                transform: translateX(100%);
             }
         }
 
-        .glass-effect {
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
         }
 
-        .floating-animation {
-            animation: float 6s ease-in-out infinite;
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Subtle floating animation for decorative elements */
+        .float-decoration {
+            animation: float 8s ease-in-out infinite;
         }
 
         @keyframes float {
 
             0%,
             100% {
-                transform: translateY(0px);
+                transform: translateY(0px) rotate(0deg);
             }
 
             50% {
-                transform: translateY(-10px);
+                transform: translateY(-15px) rotate(180deg);
             }
         }
 
-        .particle {
-            position: absolute;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            animation: particle-float 20s infinite linear;
-        }
-
-        @keyframes particle-float {
-            0% {
-                transform: translateY(100vh) rotate(0deg);
-                opacity: 0;
-            }
-
-            10% {
-                opacity: 1;
-            }
-
-            90% {
-                opacity: 1;
-            }
-
-            100% {
-                transform: translateY(-100vh) rotate(360deg);
-                opacity: 0;
-            }
+        /* Smooth transitions */
+        * {
+            transition: all 0.3s ease;
         }
     </style>
 </head>
 
-<body class="font-sans text-gray-900 antialiased overflow-hidden">
-    <!-- Animated Background -->
-    <div class="animated-bg fixed inset-0 z-0"></div>
-
-    <!-- Floating Particles -->
-    <div class="fixed inset-0 z-0 pointer-events-none">
-        <div class="particle w-2 h-2 top-10 left-10" style="animation-delay: 0s;"></div>
-        <div class="particle w-1 h-1 top-20 left-1/4" style="animation-delay: 2s;"></div>
-        <div class="particle w-3 h-3 top-32 right-1/4" style="animation-delay: 4s;"></div>
-        <div class="particle w-2 h-2 top-40 right-10" style="animation-delay: 6s;"></div>
-        <div class="particle w-1 h-1 top-60 left-1/3" style="animation-delay: 8s;"></div>
-        <div class="particle w-2 h-2 top-80 right-1/3" style="animation-delay: 10s;"></div>
-        <div class="particle w-1 h-1 bottom-20 left-1/2" style="animation-delay: 12s;"></div>
-        <div class="particle w-3 h-3 bottom-32 right-1/2" style="animation-delay: 14s;"></div>
-    </div>
-
-    <!-- Main Content -->
-    <div class="relative z-10 min-h-screen flex flex-col justify-center items-center p-4">
-        <!-- Optional Logo/Brand (only if needed) -->
-        <div class="hidden">
-            <a href="/" class="block mb-8">
-                <x-application-logo class="w-16 h-16 mx-auto text-white floating-animation" />
-            </a>
+<body class="font-sans text-gray-900 antialiased">
+    <!-- Simple Gradient Background -->
+    <div class="gradient-bg min-h-screen relative">
+        <!-- Subtle Decorative Elements -->
+        <div class="absolute top-10 left-10 w-32 h-32 bg-white bg-opacity-5 rounded-full blur-xl float-decoration">
         </div>
+        <div class="absolute top-20 right-20 w-24 h-24 bg-white bg-opacity-5 rounded-full blur-lg float-decoration"
+            style="animation-delay: -2s;"></div>
+        <div class="absolute bottom-20 left-1/4 w-40 h-40 bg-white bg-opacity-5 rounded-full blur-2xl float-decoration"
+            style="animation-delay: -4s;"></div>
+        <div class="absolute bottom-32 right-1/3 w-20 h-20 bg-white bg-opacity-5 rounded-full blur-lg float-decoration"
+            style="animation-delay: -6s;"></div>
 
-        <!-- Content Container -->
-        <div class="w-full max-w-6xl">
-            {{ $slot }}
+        <!-- Main Content -->
+        <div class="relative z-10 min-h-screen flex flex-col justify-center items-center p-4">
+            <!-- Content Container -->
+            <div class="w-full max-w-md fade-in">
+                {{ $slot }}
+            </div>
         </div>
     </div>
 
-    <!-- Decorative Elements -->
-    <div class="fixed top-10 left-10 w-20 h-20 bg-white bg-opacity-10 rounded-full blur-xl"></div>
-    <div class="fixed top-32 right-16 w-16 h-16 bg-purple-300 bg-opacity-20 rounded-full blur-lg"></div>
-    <div class="fixed bottom-20 left-1/4 w-24 h-24 bg-blue-300 bg-opacity-15 rounded-full blur-xl"></div>
-    <div class="fixed bottom-40 right-1/3 w-12 h-12 bg-pink-300 bg-opacity-20 rounded-full blur-lg"></div>
-
-    <!-- Scripts for Enhanced Interactivity -->
+    <!-- Simple JavaScript for Enhanced UX -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Add smooth scroll behavior
-            document.documentElement.style.scrollBehavior = 'smooth';
+            // Smooth page loading
+            document.body.style.opacity = '0';
+            document.body.style.transition = 'opacity 0.5s ease-in-out';
 
-            // Add subtle mouse movement effect
-            document.addEventListener('mousemove', function(e) {
-                const particles = document.querySelectorAll('.particle');
-                const x = e.clientX / window.innerWidth;
-                const y = e.clientY / window.innerHeight;
+            setTimeout(() => {
+                document.body.style.opacity = '1';
+            }, 100);
 
-                particles.forEach((particle, index) => {
-                    const speed = (index + 1) * 0.5;
-                    const xOffset = (x - 0.5) * speed;
-                    const yOffset = (y - 0.5) * speed;
+            // Add subtle focus effects to form inputs
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.style.transform = 'translateY(-2px)';
+                    this.style.boxShadow = '0 8px 25px rgba(0,0,0,0.1)';
+                });
 
-                    particle.style.transform += ` translate(${xOffset}px, ${yOffset}px)`;
+                input.addEventListener('blur', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = 'none';
                 });
             });
 
-            // Add loading animation
-            const body = document.body;
-            body.style.opacity = '0';
-            body.style.transition = 'opacity 0.5s ease-in-out';
+            // Add hover effects to buttons
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(button => {
+                button.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px)';
+                    this.style.boxShadow = '0 8px 25px rgba(0,0,0,0.15)';
+                });
 
-            setTimeout(() => {
-                body.style.opacity = '1';
-            }, 100);
+                button.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = 'none';
+                });
+            });
+
+            // Smooth form submission feedback
+            const forms = document.querySelectorAll('form');
+            forms.forEach(form => {
+                form.addEventListener('submit', function() {
+                    const button = this.querySelector('button[type="submit"]');
+                    if (button) {
+                        button.style.transform = 'scale(0.95)';
+                        button.textContent = 'Memproses...';
+                        button.disabled = true;
+                    }
+                });
+            });
         });
     </script>
 </body>
