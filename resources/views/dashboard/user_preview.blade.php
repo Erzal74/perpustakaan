@@ -143,6 +143,21 @@ if ($bytes <= 0) return '0 B' ; $units=['B', 'KB' , 'MB' , 'GB' , 'TB' ]; $pow=f
                         </div>
                     </div>
                     @endif
+                    @if(isset($previewToken))
+                    <div class="mt-8 bg-blue-50 border border-blue-200 text-blue-800 rounded-xl px-6 py-4 shadow">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 11c0 .828-.895 1.5-2 1.5s-2-.672-2-1.5.895-1.5 2-1.5 2 .672 2 1.5zM12 17.25c0 .966-.784 1.75-1.75 1.75S8.5 18.216 8.5 17.25 9.284 15.5 10.25 15.5s1.75.784 1.75 1.75zM18 11.25c0 .966-.784 1.75-1.75 1.75S14.5 12.216 14.5 11.25s.784-1.75 1.75-1.75 1.75.784 1.75 1.75z" />
+                            </svg>
+                            <p class="text-sm">
+                                Token pratinjau: <span class="font-mono font-semibold">{{ $previewToken }}</span>
+                            </p>
+                        </div>
+                    </div>
+                    @endif
+
                 </div>
             </div>
         </div>

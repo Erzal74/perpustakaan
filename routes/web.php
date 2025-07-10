@@ -74,8 +74,14 @@ Route::middleware(['auth', 'role:admin'])->prefix('dashboard/admin')->name('admi
 | Role: user (lihat & download softfile)
 */
 Route::middleware(['auth', 'role:user'])->prefix('dashboard/user')->name('user.')->group(function () {
-    Route::get('/', [UserController::class, 'index'])->name('index'); // hanya ini yang dipakai
-    Route::get('/preview/{softfile}', [UserController::class, 'show'])->name('preview');
+    Route::get('/', [UserController::class, 'index'])->name('index');
+    
+    // ✅ Preview file (gunakan method 'preview' yang memang ada)
+    Route::get('/preview/{id}', [UserController::class, 'preview'])->name('preview');
+
+    // ✅ Download file
     Route::get('/download/{softfile}', [UserController::class, 'download'])->name('download');
+
+    // ✅ Live search
     Route::get('/search', [UserController::class, 'search'])->name('search');
 });

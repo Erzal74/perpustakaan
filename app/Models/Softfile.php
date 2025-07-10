@@ -16,18 +16,35 @@ class Softfile extends Model
         'isbn',
         'issn',
         'publisher',
-        'publication_date', // Diubah dari publication_year ke publication_date
-        'original_filename'
+        'publication_date', // Disimpan sebagai date lengkap, tapi hanya ditampilkan bulan-tahun
+        'original_filename',
     ];
 
-    // Tambahkan cast untuk memastikan format date
     protected $casts = [
-        'publication_date' => 'string', // Format bulan dan tahun saja
+        'publication_date' => 'date', // Disimpan sebagai date
     ];
 
-    // Jika Anda perlu akses tahun saja sebagai attribute
+    /**
+     * Ambil hanya tahun dari publication_date.
+     */
     public function getPublicationYearAttribute()
     {
-        return $this->publication_date ? date('Y', strtotime($this->publication_date)) : null;
+        return $this->publication_date ? $this->publication_date->format('Y') : null;
+    }
+
+    /**
+     * Ambil bulan dan tahun dari publication_date (opsional).
+     */
+    public function getPublicationMonthYearAttribute()
+    {
+        return $this->publication_date ? $this->publication_date->format('F Y') : null;
+    }
+
+    /**
+     * Relasi ke dokumen PDF terkait softfile ini.
+     */
+    public function pdfDocuments()
+    {
+        return $this->hasMany(PdfDocument::class);
     }
 }
