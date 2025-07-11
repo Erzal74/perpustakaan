@@ -75,8 +75,7 @@
                     <p class="text-gray-600 mt-1">Lengkapi informasi buku yang akan diperbarui</p>
                 </div>
 
-                <form action="{{ route('admin.update', $softfile->id) }}" method="POST" enctype="multipart/form-data"
-                    class="p-6">
+                <form action="{{ route('admin.softfiles.update', $softfile->id) }}" method="POST">
                     @csrf
                     @method('PUT')
 

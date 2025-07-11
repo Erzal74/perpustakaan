@@ -43,11 +43,11 @@ Route::middleware('auth')->get('/redirect', function () {
 Route::middleware(['auth', 'role:superadmin'])->prefix('dashboard/superadmin')->name('superadmin.')->group(function () {
     // Dashboard
     Route::get('/', [SuperAdminController::class, 'index'])->name('dashboard');
-    
+
     // Management Admin
     Route::get('/admins', [SuperAdminController::class, 'listAdmins'])->name('admins.list');
     Route::post('/create-admin', [SuperAdminController::class, 'createAdmin'])->name('create-admin');
-    
+
     // Management User Approval
     Route::post('/approve/{id}', [SuperAdminController::class, 'approve'])->name('approve');
     Route::delete('/reject/{id}', [SuperAdminController::class, 'reject'])->name('reject');
@@ -62,9 +62,12 @@ Route::middleware(['auth', 'role:superadmin'])->prefix('dashboard/superadmin')->
 | Role: admin (CRUD data softfile)
 */
 Route::middleware(['auth', 'role:admin'])->prefix('dashboard/admin')->name('admin.')->group(function () {
-    // Resource Routes untuk Softfile
+    // Route untuk index
+    Route::get('/', [AdminController::class, 'index'])->name('index');
+
+    // Resource Routes untuk Softfile (pastikan include create)
     Route::resource('softfiles', AdminController::class)->except(['show']);
-    
+
     // Custom Routes
     Route::get('/preview/{id}', [AdminController::class, 'preview'])->name('preview');
     Route::get('/search', [AdminController::class, 'search'])->name('search');
@@ -79,17 +82,17 @@ Route::middleware(['auth', 'role:admin'])->prefix('dashboard/admin')->name('admi
 Route::middleware(['auth', 'role:user'])->prefix('dashboard/user')->name('user.')->group(function () {
     // Daftar Softfile
     Route::get('/', [UserController::class, 'index'])->name('index');
-    
+
     // Preview File (GET request - tidak perlu CSRF)
-   
-    
+
+
     // Download File
     Route::get('/download/{id}', [UserController::class, 'download'])->name('download');
-    
+
     // Live Search
     Route::get('/search', [UserController::class, 'search'])->name('search');
     Route::get('/preview/{id}/{token?}', [UserController::class, 'preview'])
-     ->name('preview');
+        ->name('preview');
 });
 
 /*

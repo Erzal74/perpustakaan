@@ -75,7 +75,8 @@
                     <p class="text-gray-600 mt-1">Masukkan detail lengkap buku yang akan ditambahkan</p>
                 </div>
 
-                <form action="{{ route('admin.store') }}" method="POST" enctype="multipart/form-data" class="p-6">
+                <form action="{{ route('admin.softfiles.store') }}" method="POST" enctype="multipart/form-data"
+                    class="p-6">
                     @csrf
 
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">

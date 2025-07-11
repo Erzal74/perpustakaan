@@ -147,11 +147,11 @@ public function store(Request $request)
             ->with('success', 'Buku berhasil diperbarui');
     }
 
-   public function preview(Request $request, $id) 
+   public function preview(Request $request, $id)
 {
     try {
         $softfile = Softfile::findOrFail($id);
-        
+
         // Validasi token
         if (!$request->query('token') || $softfile->preview_token !== $request->query('token')) {
             abort(403, 'Token pratinjau tidak valid');

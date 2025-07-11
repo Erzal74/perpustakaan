@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str; // ✅ Impor yang benar
 
 class Softfile extends Model
 {
@@ -17,54 +17,39 @@ class Softfile extends Model
         'isbn',
         'issn',
         'publisher',
-        'publication_date', // Disimpan sebagai date lengkap, tapi hanya ditampilkan bulan-tahun
+        'publication_date',
         'original_filename',
     ];
 
     protected $casts = [
-        'publication_date' => 'date', // Disimpan sebagai date
+        'publication_date' => 'date',
     ];
 
-    /**
-     * Ambil hanya tahun dari publication_date.
-     */
     public function getPublicationYearAttribute()
     {
         return $this->publication_date ? $this->publication_date->format('Y') : null;
     }
 
-    /**
-     * Ambil bulan dan tahun dari publication_date (opsional).
-     */
     public function getPublicationMonthYearAttribute()
     {
         return $this->publication_date ? $this->publication_date->format('F Y') : null;
     }
 
-    /**
-     * Relasi ke dokumen PDF terkait softfile ini.
-     */
-   // app/Models/Softfile.php
-public function pdfDocument()
-{
-    return $this->hasOne(PdfDocument::class);
-}
+    public function pdfDocument()
+    {
+        return $this->hasOne(PdfDocument::class);
+    }
 
-public function getPreviewTokenAttribute()
-{
-    // Ensure we always have a token
-    if (!$this->relationLoaded('pdfDocument')) {
-        $this->load('pdfDocument');
+    public function getPreviewTokenAttribute()
+    {
+        $pdfDocument = $this->pdfDocument;
+
+        if (!$pdfDocument) {
+            $pdfDocument = $this->pdfDocument()->create([
+                'preview_token' => Str::random(40),
+            ]);
+        }
+
+        return $pdfDocument->preview_token;
     }
-    
-    if (!$this->pdfDocument) {
-        // Create a PDF document if none exists
-        $this->pdfDocument()->create([
-            'preview_token' => \Str::random(40),
-            // Add other required PDF document fields here
-        ]);
-    }
-    
-    return $this->pdfDocument->preview_token;
-}
 }
