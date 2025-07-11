@@ -40,9 +40,12 @@ Route::middleware('auth')->get('/redirect', function () {
 |--------------------------------------------------------------------------
 | Role: superadmin (akses penuh, approval user)
 */
+
+Route::post('/superadmin/create-admin', [SuperAdminController::class, 'createAdmin'])->name('superadmin.create-admin');
 Route::middleware(['auth', 'role:superadmin'])->prefix('dashboard/superadmin')->name('superadmin.')->group(function () {
     Route::get('/', [SuperAdminController::class, 'index'])->name('dashboard');
 
+    Route::get('/admins', [SuperAdminController::class, 'listAdmins'])->name('admins.list');
     // Management User
     Route::post('/approve/{id}', [SuperAdminController::class, 'approve'])->name('approve');
     Route::delete('/reject/{id}', [SuperAdminController::class, 'reject'])->name('reject');
