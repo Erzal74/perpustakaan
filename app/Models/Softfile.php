@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 
 class Softfile extends Model
@@ -43,8 +44,27 @@ class Softfile extends Model
     /**
      * Relasi ke dokumen PDF terkait softfile ini.
      */
-    public function pdfDocuments()
-    {
-        return $this->hasMany(PdfDocument::class);
+   // app/Models/Softfile.php
+public function pdfDocument()
+{
+    return $this->hasOne(PdfDocument::class);
+}
+
+public function getPreviewTokenAttribute()
+{
+    // Ensure we always have a token
+    if (!$this->relationLoaded('pdfDocument')) {
+        $this->load('pdfDocument');
     }
+    
+    if (!$this->pdfDocument) {
+        // Create a PDF document if none exists
+        $this->pdfDocument()->create([
+            'preview_token' => \Str::random(40),
+            // Add other required PDF document fields here
+        ]);
+    }
+    
+    return $this->pdfDocument->preview_token;
+}
 }

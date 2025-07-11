@@ -40,13 +40,15 @@ Route::middleware('auth')->get('/redirect', function () {
 |--------------------------------------------------------------------------
 | Role: superadmin (akses penuh, approval user)
 */
-
-Route::post('/superadmin/create-admin', [SuperAdminController::class, 'createAdmin'])->name('superadmin.create-admin');
 Route::middleware(['auth', 'role:superadmin'])->prefix('dashboard/superadmin')->name('superadmin.')->group(function () {
+    // Dashboard
     Route::get('/', [SuperAdminController::class, 'index'])->name('dashboard');
-
+    
+    // Management Admin
     Route::get('/admins', [SuperAdminController::class, 'listAdmins'])->name('admins.list');
-    // Management User
+    Route::post('/create-admin', [SuperAdminController::class, 'createAdmin'])->name('create-admin');
+    
+    // Management User Approval
     Route::post('/approve/{id}', [SuperAdminController::class, 'approve'])->name('approve');
     Route::delete('/reject/{id}', [SuperAdminController::class, 'reject'])->name('reject');
     Route::post('/disable/{id}', [SuperAdminController::class, 'disable'])->name('disable');
@@ -55,20 +57,18 @@ Route::middleware(['auth', 'role:superadmin'])->prefix('dashboard/superadmin')->
 
 /*
 |--------------------------------------------------------------------------
-| ADMIN ROUTES
+| ADMIN ROUTES (Resource Controller)
 |--------------------------------------------------------------------------
 | Role: admin (CRUD data softfile)
 */
 Route::middleware(['auth', 'role:admin'])->prefix('dashboard/admin')->name('admin.')->group(function () {
-    Route::get('/', [AdminController::class, 'index'])->name('index'); // Ubah dari dashboard ke index
-    Route::get('/create', [AdminController::class, 'create'])->name('create');
-    Route::post('/', [AdminController::class, 'store'])->name('store'); // Ubah dari /store ke /
-    Route::get('/{softfile}/edit', [AdminController::class, 'edit'])->name('edit'); // Tambahkan /edit
-    Route::get('/admin/preview/{id}', [AdminController::class, 'preview'])->name('admin.preview');
-    Route::put('/{softfile}', [AdminController::class, 'update'])->name('update'); // Hapus /update
-    Route::delete('/{softfile}', [AdminController::class, 'destroy'])->name('destroy'); // Ubah dari delete ke destroy
+    // Resource Routes untuk Softfile
+    Route::resource('softfiles', AdminController::class)->except(['show']);
+    
+    // Custom Routes
+    Route::get('/preview/{id}', [AdminController::class, 'preview'])->name('preview');
+    Route::get('/search', [AdminController::class, 'search'])->name('search');
 });
-/*
 
 /*
 |--------------------------------------------------------------------------
@@ -77,14 +77,26 @@ Route::middleware(['auth', 'role:admin'])->prefix('dashboard/admin')->name('admi
 | Role: user (lihat & download softfile)
 */
 Route::middleware(['auth', 'role:user'])->prefix('dashboard/user')->name('user.')->group(function () {
+    // Daftar Softfile
     Route::get('/', [UserController::class, 'index'])->name('index');
-
-    // ✅ Preview file (gunakan method 'preview' yang memang ada)
-    Route::get('/preview/{id}', [UserController::class, 'preview'])->name('preview');
-
-    // ✅ Download file
-    Route::get('/download/{softfile}', [UserController::class, 'download'])->name('download');
-
-    // ✅ Live search
+    
+    // Preview File (GET request - tidak perlu CSRF)
+   
+    
+    // Download File
+    Route::get('/download/{id}', [UserController::class, 'download'])->name('download');
+    
+    // Live Search
     Route::get('/search', [UserController::class, 'search'])->name('search');
+    Route::get('/preview/{id}/{token?}', [UserController::class, 'preview'])
+     ->name('preview');
+});
+
+/*
+|--------------------------------------------------------------------------
+| API ROUTES untuk AJAX (Jika diperlukan)
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth')->prefix('api')->group(function () {
+    Route::get('/check-file/{id}', [UserController::class, 'checkFile'])->name('api.check-file');
 });

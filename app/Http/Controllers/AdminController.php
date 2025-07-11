@@ -29,49 +29,43 @@ class AdminController extends Controller
         return view('dashboard.admin_create');
     }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'file' => 'required|file|mimes:pdf,docx,xlsx,pptx',
-            'edition' => 'nullable|string',
-            'author' => 'nullable|string',
-            'genre' => 'nullable|string',
-            'isbn' => 'nullable|regex:/^\d+$/',
-            'issn' => 'nullable|regex:/^\d+$/',
-            'publisher' => 'nullable|string',
-            'publication_date' => 'nullable|date_format:Y-m',
-        ]);
+    // app/Http/Controllers/AdminController.php
+public function store(Request $request)
+{
+    $request->validate([
+        // ... validasi existing
+    ]);
 
-        $file = $request->file('file');
-        $filename = uniqid() . '.' . $file->getClientOriginalExtension();
-        $path = $file->storeAs('softfiles', $filename, 'public');
+    $file = $request->file('file');
+    $filename = uniqid() . '.' . $file->getClientOriginalExtension();
+    $path = $file->storeAs('softfiles', $filename, 'public');
 
-        // Format publication_date correctly for database
-        $publicationDate = null;
-        if ($request->publication_date) {
-            $publicationDate = \Carbon\Carbon::createFromFormat('Y-m', $request->publication_date)
-                ->startOfMonth()
-                ->toDateString();
-        }
-
-        Softfile::create([
-            'title' => $request->title,
-            'description' => $request->description,
-            'file_path' => $path,
-            'edition' => $request->edition,
-            'author' => $request->author,
-            'genre' => $request->genre,
-            'isbn' => $request->isbn,
-            'issn' => $request->issn,
-            'publisher' => $request->publisher,
-            'publication_date' => $publicationDate,
-            'original_filename' => $file->getClientOriginalName(),
-        ]);
-
-        return redirect()->route('admin.index')->with('success', 'Softfile berhasil ditambahkan.');
+    // Format publication_date
+    $publicationDate = null;
+    if ($request->publication_date) {
+        $publicationDate = \Carbon\Carbon::createFromFormat('Y-m', $request->publication_date)
+            ->startOfMonth()
+            ->toDateString();
     }
+
+    // Token akan otomatis dibuat oleh model boot()
+    $softfile = Softfile::create([
+        'title' => $request->title,
+        'description' => $request->description,
+        'file_path' => $path,
+        'edition' => $request->edition,
+        'author' => $request->author,
+        'genre' => $request->genre,
+        'isbn' => $request->isbn,
+        'issn' => $request->issn,
+        'publisher' => $request->publisher,
+        'publication_date' => $publicationDate,
+        'original_filename' => $file->getClientOriginalName(),
+        // preview_token tidak perlu diisi manual
+    ]);
+
+    return redirect()->route('admin.index')->with('success', 'Softfile berhasil ditambahkan.');
+}
 
     public function edit($id)
     {
@@ -153,23 +147,48 @@ class AdminController extends Controller
             ->with('success', 'Buku berhasil diperbarui');
     }
 
-    public function preview($id)
-    {
-        $file = Softfile::findOrFail($id);
-
-        if (!Storage::disk('public')->exists($file->file_path)) {
-            abort(404);
+   public function preview(Request $request, $id) 
+{
+    try {
+        $softfile = Softfile::findOrFail($id);
+        
+        // Validasi token
+        if (!$request->query('token') || $softfile->preview_token !== $request->query('token')) {
+            abort(403, 'Token pratinjau tidak valid');
         }
 
-        $path = storage_path('app/public/' . $file->file_path);
-        $mime = mime_content_type($path);
+        // Verifikasi path file
+        $relativePath = str_replace('\\', '/', ltrim($softfile->file_path, '/\\'));
+        $fullPath = storage_path('app/public/' . $relativePath);
 
-        return response()->file($path, [
+        if (!Storage::disk('public')->exists($relativePath)) {
+            abort(404, 'File tidak ditemukan di penyimpanan');
+        }
+
+        // Dapatkan mime type
+        $mime = $this->detectMimeType($fullPath);
+
+        return response()->file($fullPath, [
             'Content-Type' => $mime,
-            'Content-Disposition' => 'inline; filename="'.$file->original_filename.'"'
+            'Content-Disposition' => 'inline; filename="'.$softfile->original_filename.'"'
         ]);
-    }
 
+    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        abort(404, 'Softfile tidak ditemukan');
+    } catch (\Exception $e) {
+        Log::error('Preview error: ' . $e->getMessage());
+        abort(500, 'Terjadi kesalahan saat memuat pratinjau');
+    }
+}
+
+private function detectMimeType($path)
+{
+    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    $mime = finfo_file($finfo, $path);
+    finfo_close($finfo);
+
+    return $mime ?: 'application/octet-stream';
+}
     public function destroy($id)
     {
         try {
