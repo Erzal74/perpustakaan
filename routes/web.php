@@ -16,7 +16,7 @@ use App\Http\Controllers\SuperAdminController;
 Route::get('/', fn () => redirect()->route('login'));
 
 // ✅ Auth Routes (Breeze): login, register, etc.
-require _DIR_ . '/auth.php';
+require __DIR__ . '/auth.php';
 
 /*
 |--------------------------------------------------------------------------
