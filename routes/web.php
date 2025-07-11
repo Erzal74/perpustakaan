@@ -16,7 +16,7 @@ use App\Http\Controllers\SuperAdminController;
 Route::get('/', fn () => redirect()->route('login'));
 
 // ✅ Auth Routes (Breeze): login, register, etc.
-require __DIR__ . '/auth.php';
+require _DIR_ . '/auth.php';
 
 /*
 |--------------------------------------------------------------------------
@@ -78,7 +78,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('dashboard/admin')->name('admi
 */
 Route::middleware(['auth', 'role:user'])->prefix('dashboard/user')->name('user.')->group(function () {
     Route::get('/', [UserController::class, 'index'])->name('index');
-    
+
     // ✅ Preview file (gunakan method 'preview' yang memang ada)
     Route::get('/preview/{id}', [UserController::class, 'preview'])->name('preview');
 
