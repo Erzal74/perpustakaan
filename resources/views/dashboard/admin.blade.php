@@ -21,11 +21,10 @@
                     </div>
 
                     <a href="{{ route('admin.create') }}"
-                        class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-black px-5 py-2 rounded-lg font-medium transition-colors">
+                        class="inline-flex items-center justify-center gap-2 px-6 py-3 border border-transparent rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200 font-medium">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                         </svg>
                         Tambah Buku
                     </a>
@@ -75,15 +74,15 @@
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
-                                <!-- Kolom # -->
+                                <!-- Kolom NO -->
                                 <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    #
+                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16">
+                                    NO
                                 </th>
 
-                                <!-- Kolom Judul Buku -->
+                                <!-- Kolom Judul Buku - Diperbesar -->
                                 <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[400px] w-[400px]">
                                     <a href="{{ request()->fullUrlWithQuery(['sort' => 'title', 'direction' => request('sort') === 'title' && request('direction') === 'asc' ? 'desc' : 'asc']) }}"
                                         class="flex items-center justify-between group hover:text-gray-700">
                                         <span>Judul Buku</span>
@@ -104,7 +103,7 @@
 
                                 <!-- Kolom Pengarang -->
                                 <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-40">
                                     <a href="{{ request()->fullUrlWithQuery(['sort' => 'author', 'direction' => request('sort') === 'author' && request('direction') === 'asc' ? 'desc' : 'asc']) }}"
                                         class="flex items-center justify-between group hover:text-gray-700">
                                         <span>Pengarang</span>
@@ -123,33 +122,33 @@
                                     </a>
                                 </th>
 
-                                <!-- Kolom Edisi (tidak bisa disortir) -->
+                                <!-- Kolom Edisi -->
                                 <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
                                     Edisi
                                 </th>
 
-                                <!-- Kolom Genre (tidak bisa disortir) -->
+                                <!-- Kolom Genre -->
                                 <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-28">
                                     Genre
                                 </th>
 
-                                <!-- Kolom ISBN (tidak bisa disortir) -->
+                                <!-- Kolom ISBN -->
                                 <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
                                     ISBN
                                 </th>
 
-                                <!-- Kolom ISSN (tidak bisa disortir) -->
+                                <!-- Kolom ISSN -->
                                 <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
                                     ISSN
                                 </th>
 
                                 <!-- Kolom Penerbit -->
                                 <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-36">
                                     <a href="{{ request()->fullUrlWithQuery(['sort' => 'publisher', 'direction' => request('sort') === 'publisher' && request('direction') === 'asc' ? 'desc' : 'asc']) }}"
                                         class="flex items-center justify-between group hover:text-gray-700">
                                         <span>Penerbit</span>
@@ -170,7 +169,7 @@
 
                                 <!-- Kolom Tahun -->
                                 <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">
                                     <a href="{{ request()->fullUrlWithQuery(['sort' => 'publication_year', 'direction' => request('sort') === 'publication_year' && request('direction') === 'asc' ? 'desc' : 'asc']) }}"
                                         class="flex items-center justify-between group hover:text-gray-700">
                                         <span>Tahun</span>
@@ -189,12 +188,15 @@
                                     </a>
                                 </th>
 
+                                <!-- Kolom File -->
                                 <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
                                     File
                                 </th>
+
+                                <!-- Kolom Aksi -->
                                 <th scope="col"
-                                    class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
                                     Aksi
                                 </th>
                             </tr>
@@ -202,31 +204,37 @@
                         <tbody class="bg-white divide-y divide-gray-200">
                             @forelse ($files as $file)
                                 <tr class="hover:bg-gray-50 transition-colors">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $loop->iteration }}
+                                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{{ $loop->iteration }}
                                     </td>
-                                    <td class="px-6 py-4">
+                                    <td class="px-6 py-4 min-w-[400px] w-[400px]">
                                         <div class="flex items-center gap-3">
-                                            <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                                            <div
+                                                class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500"
                                                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                         d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                                                 </svg>
                                             </div>
-                                            <div>
-                                                <p class="font-medium text-gray-900">{{ $file->title }}</p>
+                                            <div class="flex-1 min-w-0">
+                                                <p class="font-medium text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis"
+                                                    title="{{ $file->title }}">
+                                                    {{ $file->title }}
+                                                </p>
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                        {{ $file->author ?? '-' }}
+                                    <td class="px-4 py-4 text-sm text-gray-700">
+                                        <div class="max-w-[150px]">
+                                            <p class="truncate">{{ $file->author ?? '-' }}</p>
+                                        </div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-700">
                                         <span class="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs">
                                             {{ $file->edition ?? '-' }}
                                         </span>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-700">
                                         @if ($file->genre)
                                             <span class="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs">
                                                 {{ $file->genre }}
@@ -235,16 +243,22 @@
                                             <span class="text-gray-400">-</span>
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 font-mono">
-                                        {{ $file->isbn ?? '-' }}
+                                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-700 font-mono">
+                                        <div class="max-w-[120px]">
+                                            <p class="truncate">{{ $file->isbn ?? '-' }}</p>
+                                        </div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 font-mono">
-                                        {{ $file->issn ?? '-' }}
+                                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-700 font-mono">
+                                        <div class="max-w-[120px]">
+                                            <p class="truncate">{{ $file->issn ?? '-' }}</p>
+                                        </div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                        {{ $file->publisher ?? '-' }}
+                                    <td class="px-4 py-4 text-sm text-gray-700">
+                                        <div class="max-w-[140px]">
+                                            <p class="truncate">{{ $file->publisher ?? '-' }}</p>
+                                        </div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
+                                    <td class="px-4 py-4 whitespace-nowrap">
                                         @if ($file->publication_year)
                                             <span
                                                 class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
@@ -254,7 +268,7 @@
                                             <span class="text-gray-400">-</span>
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
+                                    <td class="px-4 py-4 whitespace-nowrap">
                                         <a href="{{ asset('storage/' . $file->file_path) }}"
                                             class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm"
                                             target="_blank">
@@ -265,14 +279,14 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                             </svg>
-                                            <span class="truncate max-w-[100px]">Preview</span>
+                                            <span class="sr-only">Preview</span>
                                         </a>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <td class="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         <div class="flex justify-center gap-2">
                                             <a href="{{ route('admin.edit', $file->id) }}"
-                                                class="text-blue-600 hover:text-blue-900 p-2 rounded-md hover:bg-blue-50">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                                class="text-blue-600 hover:text-blue-900 p-2 rounded-md hover:bg-blue-50 transition-colors">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
                                                     viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                         d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -283,8 +297,8 @@
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit"
-                                                    class="text-red-600 hover:text-red-900 p-2 rounded-md hover:bg-red-50">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
+                                                    class="text-red-600 hover:text-red-900 p-2 rounded-md hover:bg-red-50 transition-colors">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
                                                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
                                                             stroke-width="2"

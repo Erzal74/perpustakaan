@@ -10,34 +10,34 @@ return new class extends Migration
     public function up()
     {
         Schema::table('softfiles', function (Blueprint $table) {
-            $table->date('publication_date')->nullable()->after('publisher');
+            $table->date('new_publication_date')->nullable();
         });
 
-        // Pindahkan data
-        DB::statement("UPDATE softfiles SET publication_date =
+        DB::statement("UPDATE softfiles SET new_publication_date =
                     CASE
-                        WHEN publication_year IS NOT NULL THEN
-                            TO_DATE(publication_year::text || '-01-01', 'YYYY-MM-DD')
+                        WHEN publication_date IS NOT NULL THEN
+                            TO_DATE(publication_date || '-01', 'YYYY-MM-DD')
                         ELSE NULL
                     END");
 
         Schema::table('softfiles', function (Blueprint $table) {
-            $table->dropColumn('publication_year');
+            $table->dropColumn('publication_date');
+            $table->renameColumn('new_publication_date', 'publication_date');
         });
     }
 
     public function down()
     {
         Schema::table('softfiles', function (Blueprint $table) {
-            $table->year('publication_year')->nullable()->after('publisher');
+            $table->string('old_publication_date', 7)->nullable();
         });
 
-        // Kembalikan data (untuk PostgreSQL)
-        DB::statement("UPDATE softfiles SET publication_year =
-                    EXTRACT(YEAR FROM publication_date)::integer");
+        DB::statement("UPDATE softfiles SET old_publication_date =
+                    TO_CHAR(publication_date, 'YYYY-MM')");
 
         Schema::table('softfiles', function (Blueprint $table) {
             $table->dropColumn('publication_date');
+            $table->renameColumn('old_publication_date', 'publication_date');
         });
     }
 };

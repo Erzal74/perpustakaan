@@ -48,8 +48,13 @@ class AdminController extends Controller
         $filename = uniqid() . '.' . $file->getClientOriginalExtension();
         $path = $file->storeAs('softfiles', $filename, 'public');
 
-        // Pastikan publication_date dalam format yang benar
-        $publicationDate = $request->publication_date ? $request->publication_date . '-01' : null;
+        // Format publication_date correctly for database
+        $publicationDate = null;
+        if ($request->publication_date) {
+            $publicationDate = \Carbon\Carbon::createFromFormat('Y-m', $request->publication_date)
+                ->startOfMonth()
+                ->toDateString();
+        }
 
         Softfile::create([
             'title' => $request->title,
@@ -61,7 +66,7 @@ class AdminController extends Controller
             'isbn' => $request->isbn,
             'issn' => $request->issn,
             'publisher' => $request->publisher,
-            'publication_date' => $publicationDate, // Format YYYY-MM-DD
+            'publication_date' => $publicationDate,
             'original_filename' => $file->getClientOriginalName(),
         ]);
 
@@ -75,36 +80,41 @@ class AdminController extends Controller
     }
 
     public function update(Request $request, $id)
-    {
-        $softfile = Softfile::findOrFail($id);
+{
+    $softfile = Softfile::findOrFail($id);
 
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'author' => 'required|string|max:255',
-            'publisher' => 'required|string|max:255',
-            'publication_date' => 'nullable|date_format:Y-m',
-            'isbn' => 'nullable|regex:/^\d+$/',
-            'issn' => 'nullable|regex:/^\d+$/',
-            'edition' => 'nullable|string|max:50',
-            'genre' => 'nullable|string|max:100',
-            'filename' => 'required|string|max:255|regex:/^[a-zA-Z0-9_\-. ]+$/',
-        ]);
+    $validated = $request->validate([
+        'title' => 'required|string|max:255',
+        'description' => 'nullable|string',
+        'author' => 'required|string|max:255',
+        'publisher' => 'required|string|max:255',
+        'publication_date' => 'nullable|date_format:Y-m',
+        'isbn' => 'nullable|regex:/^\d+$/',
+        'issn' => 'nullable|regex:/^\d+$/',
+        'edition' => 'nullable|string|max:50',
+        'genre' => 'nullable|string|max:100',
+        'filename' => 'required|string|max:255|regex:/^[a-zA-Z0-9_\-. ]+$/',
+    ]);
 
-        // Format publication_date untuk database
-        $publicationDate = $request->publication_date ? $request->publication_date . '-01' : null;
+    // Format publication_date untuk database
+    $publicationDate = null;
+    if ($request->publication_date) {
+        $publicationDate = \Carbon\Carbon::createFromFormat('Y-m', $request->publication_date)
+            ->startOfMonth()
+            ->toDateString();
+    }
 
-        $updateData = [
-            'title' => $request->title,
-            'description' => $request->description,
-            'author' => $request->author,
-            'publisher' => $request->publisher,
-            'publication_date' => $publicationDate,
-            'isbn' => $request->isbn,
-            'issn' => $request->issn,
-            'edition' => $request->edition,
-            'genre' => $request->genre,
-        ];
+    $updateData = [
+        'title' => $request->title,
+        'description' => $request->description,
+        'author' => $request->author,
+        'publisher' => $request->publisher,
+        'publication_date' => $publicationDate,
+        'isbn' => $request->isbn,
+        'issn' => $request->issn,
+        'edition' => $request->edition,
+        'genre' => $request->genre,
+    ];
 
         // Proses rename file
         $newFileName = $request->filename . '.pdf';

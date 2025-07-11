@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id" class="h-full">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,6 +8,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
+
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
 
     <!-- Navbar -->
@@ -16,9 +18,20 @@
                 <i class="fas fa-book-reader text-indigo-600 text-xl"></i>
                 <span class="text-lg font-bold">Knowledge Management System</span>
             </div>
-            <div class="space-x-4 text-sm">
-                <a href="{{ route('redirect') }}" class="text-gray-700 hover:text-indigo-600">Dashboard</a>
-                <a href="{{ route('logout') }}" class="text-red-600 hover:underline" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Keluar</a>
+            <div class="flex items-center space-x-4 text-sm">
+                @auth
+                    <span class="text-gray-700">
+                        Selamat datang,
+                        <span class="font-semibold text-indigo-600">{{ Auth::user()->name }}</span>
+                        @if (Auth::user()->role)
+                            <span class="text-xs bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full ml-2">
+                                {{ ucfirst(Auth::user()->role) }}
+                            </span>
+                        @endif
+                    </span>
+                @endauth
+                <a href="{{ route('logout') }}" class="text-red-600 hover:underline"
+                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Keluar</a>
             </div>
         </div>
     </nav>
@@ -37,4 +50,5 @@
     </footer>
 
 </body>
+
 </html>
