@@ -6,7 +6,8 @@ use App\Models\Softfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log; // Added this line
+use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class UserController extends Controller
 {
@@ -56,35 +57,28 @@ class UserController extends Controller
         try {
             $softfile = Softfile::findOrFail($id);
 
-            // Debugging
-            Log::info('Preview request', [
-                'id' => $id,
-                'file_path' => $softfile->file_path,
-                'token' => $request->query('token')
-            ]);
-
-            // Validasi token (jika menggunakan token)
+            // Validate token if using token
             if ($request->has('token') && $softfile->preview_token !== $request->token) {
                 abort(403, 'Token pratinjau tidak valid');
             }
 
-            // Verifikasi file
-            $relativePath = str_replace('\\', '/', ltrim($softfile->file_path, '/\\'));
-            $fullPath = storage_path('app/public/' . $relativePath);
+            $relativePath = $softfile->file_path;
 
             if (!Storage::disk('public')->exists($relativePath)) {
-                Log::error('File not found', [
-                    'expected' => $relativePath,
-                    'storage' => Storage::disk('public')->files('softfiles')
+                Log::error('File not found in storage', [
+                    'expected_path' => $relativePath,
+                    'available_files' => Storage::disk('public')->allFiles()
                 ]);
                 abort(404, 'File tidak ditemukan');
             }
 
-            // Return view dengan data yang diperlukan
+            // Generate correct URL for the view
+            $fileUrl = asset('storage/' . $relativePath);
+
             return view('dashboard.user_preview', [
                 'softfile' => $softfile,
                 'fileExists' => true,
-                'safeFilePath' => asset('storage/' . $relativePath),
+                'safeFilePath' => $fileUrl,
                 'previewToken' => $softfile->preview_token ?? null
             ]);
 
@@ -96,6 +90,10 @@ class UserController extends Controller
 
     private function detectMimeType($path)
     {
+        if (!file_exists($path)) {
+            return 'application/octet-stream';
+        }
+
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $mime = finfo_file($finfo, $path);
         finfo_close($finfo);
@@ -103,15 +101,63 @@ class UserController extends Controller
         return $mime ?: 'application/octet-stream';
     }
 
-    // Fungsi download file dengan pengecekan keamanan path
-    public function download(Softfile $softfile)
+    /**
+     * Download the specified softfile
+     *
+     * @param Softfile $softfile
+     * @return BinaryFileResponse
+     */
+    public function download(Softfile $softfile): BinaryFileResponse
     {
-        $path = storage_path('app/public/' . $softfile->file_path);
+        try {
+            // Dapatkan path relatif
+            $relativePath = $softfile->file_path;
 
-        if (!file_exists($path)) {
-            abort(404, 'File tidak ditemukan');
+            // Debugging
+            Log::info('Download attempt', [
+                'file_id' => $softfile->id,
+                'stored_path' => $relativePath,
+                'storage_path' => storage_path('app/public/'.$relativePath),
+                'files_in_storage' => Storage::disk('public')->allFiles()
+            ]);
+
+            // Validasi path
+            if (empty($relativePath)) {
+                Log::error('Empty file path for softfile: '.$softfile->id);
+                abort(404, 'Path file tidak valid');
+            }
+
+            // Cek eksistensi file
+            if (!Storage::disk('public')->exists($relativePath)) {
+                Log::error('File not found', [
+                    'expected_path' => $relativePath,
+                    'available_files' => Storage::disk('public')->allFiles()
+                ]);
+                abort(404, 'File tidak ditemukan di penyimpanan');
+            }
+
+            // Dapatkan full path
+            $fullPath = Storage::disk('public')->path($relativePath);
+
+            // Dapatkan mime type
+            $mimeType = $this->detectMimeType($fullPath);
+
+            // Persiapkan headers
+            $headers = [
+                'Content-Type' => $mimeType,
+                'Content-Disposition' => 'attachment; filename="'.basename($softfile->original_filename).'"',
+                'Content-Length' => filesize($fullPath),
+                'Pragma' => 'public',
+                'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+                'Expires' => '0'
+            ];
+
+            // Return response download
+            return new BinaryFileResponse($fullPath, 200, $headers, true);
+
+        } catch (\Exception $e) {
+            Log::error('Download error: '.$e->getMessage());
+            abort(500, 'Terjadi kesalahan saat mengunduh file');
         }
-
-        return response()->download($path, $softfile->original_filename);
     }
 }

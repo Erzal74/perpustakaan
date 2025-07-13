@@ -35,6 +35,17 @@ class Softfile extends Model
         return $this->publication_date ? $this->publication_date->format('F Y') : null;
     }
 
+    public function getFilePathAttribute($value)
+    {
+        // Hilangkan prefix yang tidak diperlukan
+        $value = str_replace(['storage/app/public/', 'app/public/'], '', $value);
+
+        // Bersihkan slash di awal/tengah
+        $value = ltrim($value, '/\\');
+
+        return $value;
+    }
+
     public function pdfDocument()
     {
         return $this->hasOne(PdfDocument::class);

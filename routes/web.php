@@ -83,16 +83,18 @@ Route::middleware(['auth', 'role:user'])->prefix('dashboard/user')->name('user.'
     // Daftar Softfile
     Route::get('/', [UserController::class, 'index'])->name('index');
 
-    // Preview File (GET request - tidak perlu CSRF)
-
-
-    // Download File
-    Route::get('/download/{id}', [UserController::class, 'download'])->name('download');
+    // Download File - ubah parameter menjadi {softfile}
+    Route::get('/download/{softfile}', [UserController::class, 'download'])
+        ->name('download')
+        ->whereNumber('softfile'); // Validasi ID harus numeric
 
     // Live Search
     Route::get('/search', [UserController::class, 'search'])->name('search');
+
+    // Preview File - pastikan token optional
     Route::get('/preview/{id}/{token?}', [UserController::class, 'preview'])
-        ->name('preview');
+        ->name('preview')
+        ->whereNumber('id'); // Validasi ID harus numeric
 });
 
 /*
