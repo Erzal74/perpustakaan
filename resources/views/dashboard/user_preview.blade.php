@@ -20,7 +20,7 @@
             $filePath = $softfile->file_path;
             $fileExists = Storage::disk('public')->exists($filePath);
             $fileSize = $fileExists ? Storage::disk('public')->size($filePath) : 0;
-            $fileExtension = strtoupper(pathinfo($filePath, PATHINFO_EXTENSION));
+            $fileExtension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION)); // GUNAKAN strtolower
 
             // Generate safe file URL - improved method
             $safeFilePath = Storage::disk('public')->url($filePath);
@@ -48,7 +48,7 @@
                     <div class="text-center w-full">
                         <div
                             class="relative w-40 h-56 mx-auto mb-6 rounded-lg shadow-md bg-white flex items-center justify-center">
-                            @if ($fileExtension === 'PDF')
+                            @if ($fileExtension === 'pdf')
                                 <svg class="w-16 h-16 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                                         d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -179,34 +179,162 @@
             </div>
         </div>
 
-        <!-- File Preview Section -->
         @if ($fileExists)
-            <div x-data="{ open: true }" class="mt-8">
+            <div class="mt-8">
                 <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
-                    <div class="w-full h-[80vh]">
-                        <iframe src="{{ $safeFilePath }}#toolbar=0&navpanes=0" class="w-full h-full border-none"
-                            frameborder="0"></iframe>
-                    </div>
-                </div>
-            </div>
-        @else
-            <div class="mt-8 bg-amber-50 rounded-xl shadow-lg overflow-hidden border border-amber-200">
-                <div class="px-6 py-4">
-                    <div class="flex items-center">
-                        <svg class="h-5 w-5 text-amber-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                                clip-rule="evenodd" />
-                        </svg>
-                        <h3 class="text-lg font-medium text-amber-800">File tidak tersedia</h3>
-                    </div>
-                    <div class="mt-2 text-sm text-amber-700">
-                        <p>File "{{ $softfile->original_filename }}" tidak ditemukan di server.</p>
-                        <p class="mt-2">Silakan hubungi administrator untuk melaporkan masalah ini.</p>
+                    <div class="w-full h-[80vh] flex flex-col bg-gray-50">
+                        @if ($canPreview)
+                            {{-- PDF --}}
+                            @if ($fileExtension === 'pdf')
+                                <iframe src="{{ $safeFilePath }}#toolbar=0&navpanes=0" class="w-full h-full border-none"
+                                    title="PDF Preview"></iframe>
+
+                                {{-- Gambar --}}
+                            @elseif (in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif', 'webp']))
+                                <div class="flex-1 overflow-auto flex items-center justify-center p-4">
+                                    <img src="{{ $safeFilePath }}" alt="Preview {{ $softfile->title }}"
+                                        class="max-w-full max-h-full object-contain rounded shadow-lg">
+                                </div>
+
+                                {{-- Teks --}}
+                            @elseif (in_array($fileExtension, ['txt', 'rtf', 'xml', 'html', 'htm']))
+                                <div class="flex-1 overflow-auto bg-white p-4">
+                                    <pre class="whitespace-pre-wrap font-mono text-sm text-gray-700">
+{{ htmlentities(Storage::disk('public')->get($softfile->file_path)) }}
+                            </pre>
+                                </div>
+
+                                {{-- CSV --}}
+                            @elseif ($fileExtension === 'csv')
+                                <div class="flex-1 overflow-auto bg-white p-4">
+                                    @php
+                                        $rows = [];
+                                        if (
+                                            ($handle = fopen(
+                                                Storage::disk('public')->path($softfile->file_path),
+                                                'r',
+                                            )) !== false
+                                        ) {
+                                            while (($data = fgetcsv($handle, 1000, ',')) !== false) {
+                                                $rows[] = $data;
+                                            }
+                                            fclose($handle);
+                                        }
+                                    @endphp
+                                    <div class="overflow-auto">
+                                        <table class="table-auto w-full text-sm border-collapse border border-gray-300">
+                                            @foreach ($rows as $i => $row)
+                                                <tr
+                                                    class="{{ $i === 0 ? 'bg-gray-100 font-semibold' : 'hover:bg-gray-50' }}">
+                                                    @foreach ($row as $cell)
+                                                        <td class="border border-gray-300 px-3 py-2">{{ $cell }}
+                                                        </td>
+                                                    @endforeach
+                                                </tr>
+                                            @endforeach
+                                        </table>
+                                    </div>
+                                </div>
+
+                                {{-- Dokumen Office --}}
+                            @elseif (in_array($fileExtension, ['doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx']))
+                                <div class="h-full flex flex-col">
+                                    <iframe
+                                        src="https://view.officeapps.live.com/op/embed.aspx?src={{ urlencode($safeFilePath) }}"
+                                        width="100%" height="95%" frameborder="0" class="flex-grow">
+                                    </iframe>
+                                    <div class="bg-gray-100 p-2 text-center text-sm text-gray-600">
+                                        Menggunakan Microsoft Office Online Viewer. Dokumen tidak disimpan oleh Microsoft.
+                                    </div>
+                                </div>
+
+                                {{-- Fallback jika iframe tidak bekerja --}}
+                                <script>
+                                    document.addEventListener('DOMContentLoaded', function() {
+                                        const iframe = document.querySelector('iframe[src*="officeapps.live.com"]');
+                                        iframe.onload = function() {
+                                            setTimeout(function() {
+                                                try {
+                                                    // Cek jika iframe menampilkan error
+                                                    if (iframe.contentDocument.body.innerText.includes('We\'re sorry')) {
+                                                        document.getElementById('office-fallback').classList.remove('hidden');
+                                                    }
+                                                } catch (e) {
+                                                    console.log('Cannot check iframe content');
+                                                }
+                                            }, 3000);
+                                        };
+                                    });
+                                </script>
+
+                                <div id="office-fallback"
+                                    class="hidden flex-1 flex flex-col items-center justify-center p-8 text-center">
+                                    <div
+                                        class="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mb-4">
+                                        ⚠️
+                                    </div>
+                                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Gagal Memuat Preview</h3>
+                                    <p class="text-gray-600 mb-4">
+                                        Tidak dapat memuat preview dokumen. Silakan download untuk melihat isi file.
+                                    </p>
+                                    <a href="{{ $safeFilePath }}"
+                                        class="inline-flex items-center px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                        download>
+                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                        </svg>
+                                        Download Dokumen
+                                    </a>
+                                </div>
+                            @else
+                                <div class="flex-1 flex flex-col items-center justify-center p-8 text-center">
+                                    <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                                        📄
+                                    </div>
+                                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Pratinjau Tidak Didukung</h3>
+                                    <p class="text-gray-600 mb-4">
+                                        Format file .{{ $fileExtension }} tidak dapat dipratinjau langsung di browser.
+                                    </p>
+                                    <a href="{{ $safeFilePath }}"
+                                        class="inline-flex items-center px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                        download>
+                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                        </svg>
+                                        Download Dokumen Asli
+                                    </a>
+                                </div>
+                            @endif
+                        @else
+                            {{-- Jika $canPreview === false --}}
+                            <div class="flex-1 flex flex-col items-center justify-center p-8 text-center">
+                                <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                                    📄
+                                </div>
+                                <h3 class="text-xl font-semibold text-gray-800 mb-2">Pratinjau Tidak Tersedia</h3>
+                                <p class="text-gray-600 mb-4">
+                                    Format file .{{ $fileExtension }} tidak dapat dipratinjau langsung di browser.
+                                </p>
+                                <a href="{{ $safeFilePath }}"
+                                    class="inline-flex items-center px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                    download>
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                    </svg>
+                                    Download Dokumen
+                                </a>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
         @endif
+
 
         <!-- Additional Information -->
         <div class="mt-8 bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
