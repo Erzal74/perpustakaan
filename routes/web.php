@@ -68,6 +68,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('dashboard/admin')->name('admi
     Route::get('/preview/{id}', [AdminController::class, 'preview'])->name('preview');
     Route::get('/search', [AdminController::class, 'search'])->name('search');
 
+    Route::get('/softfiles/{id}/preview', [AdminController::class, 'preview'])
+    ->name('softfiles.preview');
+
     // ✅ BARU ROUTE RESOURCE
     Route::resource('softfiles', AdminController::class)->except(['show']);
 

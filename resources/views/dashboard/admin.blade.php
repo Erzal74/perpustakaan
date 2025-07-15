@@ -361,7 +361,7 @@
                                         </td>
 
                                         <td class="px-4 py-4 whitespace-nowrap">
-                                            <a href="{{ asset('storage/' . $file->file_path) }}"
+                                            <a href="{{ route('admin.softfiles.preview', ['id' => $file->id, 'token' => $file->preview_token]) }}"
                                                 class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm"
                                                 target="_blank">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"

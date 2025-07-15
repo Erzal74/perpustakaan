@@ -128,7 +128,8 @@ class AdminController extends Controller
         ];
 
         // Proses rename file
-        $newFileName = $request->filename . '.pdf';
+        $extension = pathinfo($softfile->original_filename, PATHINFO_EXTENSION);
+        $newFileName = $request->filename . '.' . $extension;
         $currentFileName = $softfile->original_filename;
 
         if ($newFileName !== $currentFileName) {
@@ -165,38 +166,71 @@ class AdminController extends Controller
     }
 
     public function preview(Request $request, $id)
-    {
-        try {
-            $softfile = Softfile::findOrFail($id);
+{
+    try {
+        $softfile = Softfile::findOrFail($id);
 
-            // Validasi token
-            if (!$request->query('token') || $softfile->preview_token !== $request->query('token')) {
-                abort(403, 'Token pratinjau tidak valid');
-            }
-
-            // Verifikasi path file
-            $relativePath = str_replace('\\', '/', ltrim($softfile->file_path, '/\\'));
-            $fullPath = storage_path('app/public/' . $relativePath);
-
-            if (!Storage::disk('public')->exists($relativePath)) {
-                abort(404, 'File tidak ditemukan di penyimpanan');
-            }
-
-            // Dapatkan mime type
-            $mime = $this->detectMimeType($fullPath);
-
-            return response()->file($fullPath, [
-                'Content-Type' => $mime,
-                'Content-Disposition' => 'inline; filename="'.$softfile->original_filename.'"'
-            ]);
-
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            abort(404, 'Softfile tidak ditemukan');
-        } catch (\Exception $e) {
-            Log::error('Preview error: ' . $e->getMessage());
-            abort(500, 'Terjadi kesalahan saat memuat pratinjau');
+        // Validasi token
+        if (!$request->query('token') || $softfile->preview_token !== $request->query('token')) {
+            abort(403, 'Token pratinjau tidak valid');
         }
+
+        $relativePath = str_replace('\\', '/', ltrim($softfile->file_path, '/\\'));
+        $fullPath = storage_path('app/public/' . $relativePath);
+
+        if (!Storage::disk('public')->exists($relativePath)) {
+            abort(404, 'File tidak ditemukan di penyimpanan');
+        }
+
+        $extension = strtolower(pathinfo($softfile->original_filename, PATHINFO_EXTENSION));
+        $mime = $this->detectMimeType($fullPath);
+
+        // Handle CSV files - convert to HTML table
+        if ($extension === 'csv') {
+            return $this->previewCsv($fullPath, $softfile->original_filename);
+        }
+
+        // Handle DOC/DOCX files - use Google Docs Viewer
+        if (in_array($extension, ['doc', 'docx'])) {
+            return $this->previewDoc($fullPath, $softfile->original_filename);
+        }
+
+        // Default behavior for other files
+        return response()->file($fullPath, [
+            'Content-Type' => $mime,
+            'Content-Disposition' => 'inline; filename="'.$softfile->original_filename.'"'
+        ]);
+
+    } catch (\Exception $e) {
+        Log::error('Preview error: ' . $e->getMessage());
+        abort(500, 'Terjadi kesalahan saat memuat pratinjau');
     }
+}
+
+private function previewCsv($filePath, $filename)
+{
+    $csvData = array_map('str_getcsv', file($filePath));
+    $html = view('previews.csv', [
+        'data' => $csvData,
+        'filename' => $filename
+    ])->render();
+
+    return response($html);
+}
+
+private function previewDoc($filePath, $filename)
+{
+    // Generate public URL (pastikan file bisa diakses publik)
+    $publicUrl = asset('storage/' . str_replace('storage/app/public/', '', $filePath));
+
+    // Gunakan Google Docs Viewer
+    $googleDocsUrl = "https://docs.google.com/gview?url=" . urlencode($publicUrl) . "&embedded=true";
+
+    return view('previews.doc', [
+        'googleDocsUrl' => $googleDocsUrl,
+        'filename' => $filename
+    ]);
+}
 
     private function detectMimeType($path)
     {
