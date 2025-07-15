@@ -62,16 +62,19 @@ Route::middleware(['auth', 'role:superadmin'])->prefix('dashboard/superadmin')->
 | Role: admin (CRUD data softfile)
 */
 Route::middleware(['auth', 'role:admin'])->prefix('dashboard/admin')->name('admin.')->group(function () {
-    // Route untuk index
-    Route::get('/', [AdminController::class, 'index'])->name('index');
 
-    // Resource Routes untuk Softfile (pastikan include create)
-    Route::resource('softfiles', AdminController::class)->except(['show']);
-
-    // Custom Routes
+    // ✅ CUSTOM ROUTES DULU
+    Route::delete('/softfiles/bulk', [AdminController::class, 'bulkDestroy'])->name('softfiles.bulk');
     Route::get('/preview/{id}', [AdminController::class, 'preview'])->name('preview');
     Route::get('/search', [AdminController::class, 'search'])->name('search');
+
+    // ✅ BARU ROUTE RESOURCE
+    Route::resource('softfiles', AdminController::class)->except(['show']);
+
+    // ✅ INDEX
+    Route::get('/', [AdminController::class, 'index'])->name('index');
 });
+
 
 /*
 |--------------------------------------------------------------------------

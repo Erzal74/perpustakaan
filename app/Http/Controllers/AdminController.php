@@ -10,20 +10,21 @@ use Illuminate\Support\Facades\Log; // Added this line
 class AdminController extends Controller
 {
     public function index()
-    {
-        $sortField = request('sort', 'created_at');
-        $sortDirection = request('direction', 'desc');
+{
+    $sortField = request('sort', 'created_at');
+    $sortDirection = request('direction', 'desc');
 
-        $files = Softfile::query() // Perbaikan: Softfile bukan SoftFile
-            ->when(request('sort'), function ($query) use ($sortField, $sortDirection) {
-                $query->orderBy($sortField, $sortDirection);
-            }, function ($query) {
-                $query->latest();
-            })
-            ->get();
+    $files = Softfile::query()
+        ->when(request('sort'), function ($query) use ($sortField, $sortDirection) {
+            $query->orderBy($sortField, $sortDirection);
+        }, function ($query) {
+            $query->latest();
+        })
+        ->paginate(10); // GANTI INI!
 
-        return view('dashboard.admin', compact('files'));
-    }
+    return view('dashboard.admin', compact('files'));
+}
+
 
     public function create()
     {
@@ -211,4 +212,32 @@ class AdminController extends Controller
                 ->with('error', 'Gagal menghapus buku: ' . $e->getMessage());
         }
     }
+   public function bulkDestroy(Request $request)
+{
+    $request->validate([
+        'ids' => 'required|array',
+        'ids.*' => 'exists:softfiles,id',
+    ]);
+
+    try {
+        $count = 0;
+        foreach ($request->ids as $id) {
+            $file = Softfile::find($id);
+            if ($file) {
+                if (Storage::disk('public')->exists($file->file_path)) {
+                    Storage::disk('public')->delete($file->file_path);
+                }
+                $file->delete();
+                $count++;
+            }
+        }
+
+        return back()->with('success', "Berhasil menghapus $count buku.");
+
+    } catch (\Exception $e) {
+        Log::error('Bulk delete error: ' . $e->getMessage());
+        return back()->with('error', 'Gagal menghapus buku: ' . $e->getMessage());
+    }
+}
+
 }
