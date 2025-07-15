@@ -9,21 +9,37 @@ use Illuminate\Support\Facades\Log; // Added this line
 
 class AdminController extends Controller
 {
+    // Tambahkan method search dan perbaiki method index
     public function index()
-{
-    $sortField = request('sort', 'created_at');
-    $sortDirection = request('direction', 'desc');
+    {
+        $sortField = request('sort', 'created_at');
+        $sortDirection = request('direction', 'desc');
+        $searchQuery = request('search');
 
-    $files = Softfile::query()
-        ->when(request('sort'), function ($query) use ($sortField, $sortDirection) {
-            $query->orderBy($sortField, $sortDirection);
-        }, function ($query) {
-            $query->latest();
-        })
-        ->paginate(10); // GANTI INI!
+        $files = Softfile::query()
+            ->when($searchQuery, function ($query) use ($searchQuery) {
+                $query->where(function($q) use ($searchQuery) {
+                    $q->where('title', 'like', '%'.$searchQuery.'%')
+                    ->orWhere('author', 'like', '%'.$searchQuery.'%')
+                    ->orWhere('publisher', 'like', '%'.$searchQuery.'%')
+                    ->orWhere('isbn', 'like', '%'.$searchQuery.'%')
+                    ->orWhere('issn', 'like', '%'.$searchQuery.'%');
+                });
+            })
+            ->when(request('sort'), function ($query) use ($sortField, $sortDirection) {
+                $query->orderBy($sortField, $sortDirection);
+            }, function ($query) {
+                $query->latest();
+            })
+            ->paginate(10);
 
-    return view('dashboard.admin', compact('files'));
-}
+        return view('dashboard.admin', compact('files'));
+    }
+
+    public function search(Request $request)
+    {
+        return $this->index();
+    }
 
 
     public function create()
