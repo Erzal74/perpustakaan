@@ -19,28 +19,35 @@ use PhpOffice\PhpWord\Element\Text;
 class UserController extends Controller
 {
     public function index(Request $request)
-    {
-        $validSorts = ['title', 'author', 'publisher', 'publication_year', 'created_at'];
-        $sort = in_array($request->sort, $validSorts) ? $request->sort : 'created_at';
-        $direction = $request->direction === 'asc' ? 'asc' : 'desc';
-        $search = $request->get('search');
+{
+    $validSorts = ['title', 'author', 'publisher', 'publication_year', 'created_at'];
+    $sort = in_array($request->sort, $validSorts) ? $request->sort : 'created_at';
+    $direction = $request->direction === 'asc' ? 'asc' : 'desc';
+    $search = $request->get('search');
 
-        $files = Softfile::query()
-            ->when($search, function ($qBuilder) use ($search) {
-                $qBuilder->where('title', 'ILIKE', "%{$search}%")
-                        ->orWhere('author', 'ILIKE', "%{$search}%")
-                        ->orWhere('publisher', 'ILIKE', "%{$search}%");
-            })
-            ->orderBy($sort, $direction)
-            ->paginate(10)
-            ->withQueryString();
+    $files = Softfile::query()
+        ->when($search, function ($query) use ($search) {
+            $searchLower = strtolower($search);
+            $query->where(function ($q) use ($searchLower) {
+                $q->whereRaw("LOWER(title) LIKE ?", ["{$searchLower}%"])
+                  ->orWhereRaw("LOWER(title) LIKE ?", ["% {$searchLower}%"])
+                  ->orWhereRaw("LOWER(author) LIKE ?", ["{$searchLower}%"])
+                  ->orWhereRaw("LOWER(author) LIKE ?", ["% {$searchLower}%"])
+                  ->orWhereRaw("LOWER(publisher) LIKE ?", ["{$searchLower}%"])
+                  ->orWhereRaw("LOWER(publisher) LIKE ?", ["% {$searchLower}%"]);
+            });
+        })
+        ->orderBy($sort, $direction)
+        ->paginate(10)
+        ->withQueryString();
 
-        return view('dashboard.user', [
-            'files' => $files,
-            'currentSort' => $sort,
-            'currentDirection' => $direction
-        ]);
-    }
+    return view('dashboard.user', [
+        'files' => $files,
+        'currentSort' => $sort,
+        'currentDirection' => $direction
+    ]);
+}
+
 
     public function search(Request $request)
     {
