@@ -37,6 +37,12 @@ class SuperAdminController extends Controller
     public function disable($id)
     {
         $user = User::findOrFail($id);
+
+        // Cek jika user yang akan dinonaktifkan adalah superadmin yang sedang login
+        if ($user->id === Auth::id()) {
+            return back()->with('error', 'Anda tidak bisa menonaktifkan akun sendiri.');
+        }
+
         $user->status = 'disabled';
         $user->save();
 
@@ -59,31 +65,50 @@ class SuperAdminController extends Controller
             return back()->with('error', 'Unauthorized action.');
         }
 
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-            'role' => 'required|in:admin,superadmin'
+        $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|string|email|max:255|unique:users',
+        'password' => 'required|string|min:8',
+        'role' => 'required|in:admin,superadmin'
         ]);
 
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => $request->role,
-            'status' => 'approved',
-            'email_verified_at' => now()
-        ]);
+        try {
+            // Buat user baru
+            User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => Hash::make($validated['password']),
+                'role' => $validated['role'],
+                'status' => 'approved',
+                'email_verified_at' => now()
+            ]);
 
-        return back()->with('success', ucfirst($request->role) . ' berhasil dibuat');
+            return redirect()
+                ->route('superadmin.admins.list')
+                ->with('success', 'Admin baru berhasil ditambahkan!');
+
+        } catch (\Exception $e) {
+            return back()
+                ->withInput()
+                ->with('error', 'Gagal menambahkan admin: ' . $e->getMessage());
+        }
     }
 
-    public function listAdmins()
+    public function listAdmins(Request $request)
     {
-        $admins = User::whereIn('role', ['admin', 'superadmin'])
+        $query = User::whereIn('role', ['admin', 'superadmin'])
                     ->orderBy('role')
-                    ->orderBy('name')
-                    ->get();
+                    ->orderBy('name');
+
+        if ($request->has('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%$search%")
+                ->orWhere('email', 'like', "%$search%");
+            });
+        }
+
+        $admins = $query->get();
 
         return view('dashboard.admin-list', compact('admins'));
     }
