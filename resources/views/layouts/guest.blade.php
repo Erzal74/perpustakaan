@@ -15,38 +15,20 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    <!-- Simple and Clean Styles -->
     <style>
         body {
             font-family: 'Inter', sans-serif;
         }
 
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            position: relative;
+        .bg-pattern {
+            background-color: #f8fafc;
+            background-image:
+                radial-gradient(circle at 1px 1px, #e2e8f0 1px, transparent 0);
+            background-size: 20px 20px;
         }
 
-        .gradient-bg::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.05) 50%, transparent 70%);
-            animation: shimmer 3s ease-in-out infinite;
-        }
-
-        @keyframes shimmer {
-
-            0%,
-            100% {
-                transform: translateX(-100%);
-            }
-
-            50% {
-                transform: translateX(100%);
-            }
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
 
         .fade-in {
@@ -65,9 +47,35 @@
             }
         }
 
-        /* Subtle floating animation for decorative elements */
-        .float-decoration {
-            animation: float 8s ease-in-out infinite;
+        .input-focus {
+            transition: all 0.3s ease;
+        }
+
+        .input-focus:focus {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+        }
+
+        .btn-hover {
+            transition: all 0.3s ease;
+        }
+
+        .btn-hover:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+        }
+
+        .btn-hover:active {
+            transform: translateY(0);
+        }
+
+        /* Decorative circles */
+        .decoration-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            opacity: 0.1;
+            animation: float 6s ease-in-out infinite;
         }
 
         @keyframes float {
@@ -78,40 +86,60 @@
             }
 
             50% {
-                transform: translateY(-15px) rotate(180deg);
+                transform: translateY(-20px) rotate(180deg);
             }
         }
 
-        /* Smooth transitions */
-        * {
-            transition: all 0.3s ease;
+        .decoration-circle:nth-child(1) {
+            width: 60px;
+            height: 60px;
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .decoration-circle:nth-child(2) {
+            width: 80px;
+            height: 80px;
+            top: 20%;
+            right: 15%;
+            animation-delay: 2s;
+        }
+
+        .decoration-circle:nth-child(3) {
+            width: 40px;
+            height: 40px;
+            bottom: 30%;
+            left: 20%;
+            animation-delay: 4s;
+        }
+
+        .decoration-circle:nth-child(4) {
+            width: 100px;
+            height: 100px;
+            bottom: 10%;
+            right: 10%;
+            animation-delay: 1s;
         }
     </style>
 </head>
 
 <body class="font-sans text-gray-900 antialiased">
-    <!-- Simple Gradient Background -->
-    <div class="gradient-bg min-h-screen relative">
-        <!-- Subtle Decorative Elements -->
-        <div class="absolute top-10 left-10 w-32 h-32 bg-white bg-opacity-5 rounded-full blur-xl float-decoration">
-        </div>
-        <div class="absolute top-20 right-20 w-24 h-24 bg-white bg-opacity-5 rounded-full blur-lg float-decoration"
-            style="animation-delay: -2s;"></div>
-        <div class="absolute bottom-20 left-1/4 w-40 h-40 bg-white bg-opacity-5 rounded-full blur-2xl float-decoration"
-            style="animation-delay: -4s;"></div>
-        <div class="absolute bottom-32 right-1/3 w-20 h-20 bg-white bg-opacity-5 rounded-full blur-lg float-decoration"
-            style="animation-delay: -6s;"></div>
+    <div class="bg-pattern min-h-screen relative overflow-hidden">
+        <!-- Decorative Elements -->
+        <div class="decoration-circle"></div>
+        <div class="decoration-circle"></div>
+        <div class="decoration-circle"></div>
+        <div class="decoration-circle"></div>
 
         <!-- Main Content -->
         <div class="relative z-10 min-h-screen flex flex-col justify-center items-center p-4">
-            <!-- Content Container -->
             <div class="w-full max-w-md fade-in">
                 {{ $slot }}
             </div>
         </div>
     </div>
 
-    <!-- Simple JavaScript for Enhanced UX -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Smooth page loading
@@ -122,42 +150,44 @@
                 document.body.style.opacity = '1';
             }, 100);
 
-            // Add subtle focus effects to form inputs
+            // Enhanced form interactions
             const inputs = document.querySelectorAll('input');
             inputs.forEach(input => {
+                input.classList.add('input-focus');
+
+                // Add floating label effect
                 input.addEventListener('focus', function() {
-                    this.style.transform = 'translateY(-2px)';
-                    this.style.boxShadow = '0 8px 25px rgba(0,0,0,0.1)';
+                    const label = this.previousElementSibling;
+                    if (label && label.tagName === 'LABEL') {
+                        label.style.color = '#3b82f6';
+                        label.style.transform = 'scale(0.95)';
+                    }
                 });
 
                 input.addEventListener('blur', function() {
-                    this.style.transform = 'translateY(0)';
-                    this.style.boxShadow = 'none';
+                    const label = this.previousElementSibling;
+                    if (label && label.tagName === 'LABEL') {
+                        label.style.color = '#374151';
+                        label.style.transform = 'scale(1)';
+                    }
                 });
             });
 
-            // Add hover effects to buttons
+            // Enhanced button interactions
             const buttons = document.querySelectorAll('button');
             buttons.forEach(button => {
-                button.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateY(-2px)';
-                    this.style.boxShadow = '0 8px 25px rgba(0,0,0,0.15)';
-                });
-
-                button.addEventListener('mouseleave', function() {
-                    this.style.transform = 'translateY(0)';
-                    this.style.boxShadow = 'none';
-                });
+                button.classList.add('btn-hover');
             });
 
-            // Smooth form submission feedback
+            // Form submission handling
             const forms = document.querySelectorAll('form');
             forms.forEach(form => {
                 form.addEventListener('submit', function() {
                     const button = this.querySelector('button[type="submit"]');
                     if (button) {
-                        button.style.transform = 'scale(0.95)';
-                        button.textContent = 'Memproses...';
+                        button.style.transform = 'scale(0.98)';
+                        button.innerHTML =
+                            '<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Memproses...';
                         button.disabled = true;
                     }
                 });
