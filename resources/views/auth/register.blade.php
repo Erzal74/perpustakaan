@@ -159,7 +159,7 @@
         <!-- Footer -->
         <div class="text-center mt-8 pt-6 border-t border-gray-200">
             <p class="text-xs text-gray-500">
-                © 2024 Knowledge Management System. All rights reserved.
+                © 2025 Knowledge Management System. All rights reserved.
             </p>
         </div>
     </div>
