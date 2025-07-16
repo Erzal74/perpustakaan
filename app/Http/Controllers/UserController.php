@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\URL
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use App\Models\Download;
 
 // Tambahan untuk PhpWord
 use PhpOffice\PhpWord\IOFactory;
@@ -18,36 +19,103 @@ use PhpOffice\PhpWord\Element\Text;
 
 class UserController extends Controller
 {
-    public function index(Request $request)
+   public function index(Request $request)
 {
-    $validSorts = ['title', 'author', 'publisher', 'publication_year', 'created_at'];
+    $validSorts = ['title', 'author', 'publisher', 'publication_year', 'created_at', 'downloads_count'];
     $sort = in_array($request->sort, $validSorts) ? $request->sort : 'created_at';
     $direction = $request->direction === 'asc' ? 'asc' : 'desc';
     $search = $request->get('search');
+    $filter = $request->get('filter', 'all');
 
     $files = Softfile::query()
+        ->withCount(['downloads as downloads_count'])
         ->when($search, function ($query) use ($search) {
             $searchLower = strtolower($search);
             $query->where(function ($q) use ($searchLower) {
-                $q->whereRaw("LOWER(title) LIKE ?", ["{$searchLower}%"])
-                  ->orWhereRaw("LOWER(title) LIKE ?", ["% {$searchLower}%"])
-                  ->orWhereRaw("LOWER(author) LIKE ?", ["{$searchLower}%"])
-                  ->orWhereRaw("LOWER(author) LIKE ?", ["% {$searchLower}%"])
-                  ->orWhereRaw("LOWER(publisher) LIKE ?", ["{$searchLower}%"])
-                  ->orWhereRaw("LOWER(publisher) LIKE ?", ["% {$searchLower}%"]);
+                $q->whereRaw("LOWER(title) LIKE ?", ["%{$searchLower}%"])
+                  ->orWhereRaw("LOWER(author) LIKE ?", ["%{$searchLower}%"])
+                  ->orWhereRaw("LOWER(publisher) LIKE ?", ["%{$searchLower}%"])
+                  ->orWhereRaw("LOWER(isbn) LIKE ?", ["%{$searchLower}%"])
+                  ->orWhereRaw("LOWER(issn) LIKE ?", ["%{$searchLower}%"]);
             });
+        })
+        ->when($filter, function ($query) use ($filter) {
+            switch ($filter) {
+                case 'popular':
+                    $query->orderBy('downloads_count', 'desc');
+                    break;
+                case 'new':
+                    $query->where('created_at', '>=', now()->subDays(30));
+                    break;
+                case 'recommended':
+                    $query->whereIn('genre', auth()->user()->preferred_genres ?? []);
+                    break;
+                case 'textbook':
+                    $query->where('category', 'textbook');
+                    break;
+            }
         })
         ->orderBy($sort, $direction)
         ->paginate(10)
         ->withQueryString();
 
-    return view('dashboard.user', [
-        'files' => $files,
-        'currentSort' => $sort,
-        'currentDirection' => $direction
-    ]);
-}
+    // Get statistics for the dashboard
+    $stats = [
+        'totalBooks' => Softfile::count(),
+        'newThisMonth' => Softfile::where('created_at', '>=', now()->startOfMonth())->count(),
+        'popularBook' => Softfile::withCount(['downloads as downloads_count' => function($query) {
+            $query->where('created_at', '>=', now()->startOfMonth());
+        }])->orderBy('downloads_count', 'desc')->first(),
+        'userDownloads' => auth()->user()->downloads()->count(),
+        'lastDownload' => auth()->user()->downloads()->latest()->first()->created_at ?? null,
+        'monthlyDownloads' => Download::where('created_at', '>=', now()->startOfMonth())->count(),
+    ];
 
+    // Get recently viewed books (if you have this functionality)
+    // With:
+$recentlyViewed = auth()->user()->downloads()
+    ->with('softfile')
+    ->latest()
+    ->limit(4)
+    ->get()
+    ->pluck('softfile');
+
+    // Get recommended books (basic implementation)
+    $recommendedBooks = Softfile::withCount('downloads')
+        ->orderBy('downloads_count', 'desc')
+        ->limit(4)
+        ->get();
+
+   return view('dashboard.user', [
+    'files' => $files,
+    'currentSort' => $sort,
+    'currentDirection' => $direction,
+    'newBooksThisMonth' => $stats['newThisMonth'],
+    'mostPopularBook' => $stats['popularBook'],
+    'userDownloadsCount' => $stats['userDownloads'],
+    'lastDownloadTime' => $stats['lastDownload'],
+    'totalDownloadsThisMonth' => $stats['monthlyDownloads'],
+    'recentlyViewed' => $recentlyViewed,
+    'recommendedBooks' => $recommendedBooks,
+    'searchQuery' => $search,
+    'activeFilter' => $filter,
+    'maxDownloads' => Softfile::withCount('downloads')
+    ->get()
+    ->max('downloads_count') ?? 1,
+    'downloadGrowth' => $this->calculateDownloadGrowth(), // You'll need to implement this method
+]);
+}
+private function calculateDownloadGrowth()
+{
+    $currentMonth = Download::where('created_at', '>=', now()->startOfMonth())->count();
+    $lastMonth = Download::whereBetween('created_at', [now()->subMonth()->startOfMonth(), now()->subMonth()->endOfMonth()])->count();
+    
+    if ($lastMonth == 0) {
+        return 0;
+    }
+    
+    return (($currentMonth - $lastMonth) / $lastMonth) * 100;
+}
 
     public function search(Request $request)
     {
@@ -128,51 +196,57 @@ class UserController extends Controller
         return $mime ?: 'application/octet-stream';
     }
 
-    public function download(Softfile $softfile): BinaryFileResponse
-    {
-        try {
-            $relativePath = $softfile->file_path;
+    // app/Http/Controllers/UserController.php
 
-            Log::info('Download attempt', [
-                'file_id' => $softfile->id,
-                'stored_path' => $relativePath,
-                'storage_path' => storage_path('app/public/'.$relativePath),
-                'files_in_storage' => Storage::disk('public')->allFiles()
-            ]);
+public function download(Softfile $softfile): BinaryFileResponse
+{
+    try {
+        // Record the download
+        $softfile->downloads()->create([
+            'user_id' => auth()->id()
+        ]);
 
-            if (empty($relativePath)) {
-                Log::error('Empty file path for softfile: '.$softfile->id);
-                abort(404, 'Path file tidak valid');
-            }
+        $relativePath = $softfile->file_path;
 
-            if (!Storage::disk('public')->exists($relativePath)) {
-                Log::error('File not found', [
-                    'expected_path' => $relativePath,
-                    'available_files' => Storage::disk('public')->allFiles()
-                ]);
-                abort(404, 'File tidak ditemukan di penyimpanan');
-            }
+        Log::info('Download attempt', [
+            'file_id' => $softfile->id,
+            'stored_path' => $relativePath,
+            'storage_path' => storage_path('app/public/'.$relativePath),
+            'files_in_storage' => Storage::disk('public')->allFiles()
+        ]);
 
-            $fullPath = Storage::disk('public')->path($relativePath);
-            $mimeType = $this->detectMimeType($fullPath);
-
-            $headers = [
-                'Content-Type' => $mimeType,
-                'Content-Disposition' => 'attachment; filename="'.basename($softfile->original_filename).'"',
-                'Content-Length' => filesize($fullPath),
-                'Pragma' => 'public',
-                'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
-                'Expires' => '0'
-            ];
-
-            return new BinaryFileResponse($fullPath, 200, $headers, true);
-
-        } catch (\Exception $e) {
-            Log::error('Download error: '.$e->getMessage());
-            abort(500, 'Terjadi kesalahan saat mengunduh file');
+        if (empty($relativePath)) {
+            Log::error('Empty file path for softfile: '.$softfile->id);
+            abort(404, 'Path file tidak valid');
         }
-    }
 
+        if (!Storage::disk('public')->exists($relativePath)) {
+            Log::error('File not found', [
+                'expected_path' => $relativePath,
+                'available_files' => Storage::disk('public')->allFiles()
+            ]);
+            abort(404, 'File tidak ditemukan di penyimpanan');
+        }
+
+        $fullPath = Storage::disk('public')->path($relativePath);
+        $mimeType = $this->detectMimeType($fullPath);
+
+        $headers = [
+            'Content-Type' => $mimeType,
+            'Content-Disposition' => 'attachment; filename="'.basename($softfile->original_filename).'"',
+            'Content-Length' => filesize($fullPath),
+            'Pragma' => 'public',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0'
+        ];
+
+        return new BinaryFileResponse($fullPath, 200, $headers, true);
+
+    } catch (\Exception $e) {
+        Log::error('Download error: '.$e->getMessage());
+        abort(500, 'Terjadi kesalahan saat mengunduh file');
+    }
+}
     public function previewDoc(Request $request, $id)
     {
         $softfile = Softfile::findOrFail($id);

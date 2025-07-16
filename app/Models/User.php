@@ -10,32 +10,35 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    // Pada Model User:
-protected $fillable = [
-    'name',
-    'email',
-    'password',
-    'role',
-    'status', // Ubah dari is_approved ke status
-    'email_verified_at'
-];
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array
-     */
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'role',
+        'status',
+        'email_verified_at'
+    ];
+
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array
-     */
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function downloads()
+    {
+        return $this->hasMany(Download::class);
+    }
+
+    // Relasi yang sudah diperbaiki
+    public function recentlyViewed()
+    {
+        return $this->belongsToMany(Softfile::class, 'recently_viewed')
+                   ->withTimestamps()
+                   ->latest();
+    }
 }
