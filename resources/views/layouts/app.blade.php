@@ -47,7 +47,7 @@
 
     <!-- Footer -->
     <footer class="text-center text-sm text-gray-500 py-4 border-t">
-        &copy; {{ date('Y') }} © 2025 Knowledge Management System.
+        &copy; {{ date('Y') }} Knowledge Management System.
     </footer>
 
 </body>

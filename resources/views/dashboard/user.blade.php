@@ -210,15 +210,7 @@
                             <h3 class="text-lg font-semibold text-gray-800">Daftar Buku</h3>
                             <p class="text-gray-600 mt-1">Temukan dan unduh koleksi buku digital</p>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-sm text-gray-500">Urutkan:</span>
-                            <select id="sortSelect" class="text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                                <option value="title_asc" {{ request('sort') === 'title' && request('direction') === 'asc' ? 'selected' : '' }}>Judul (A-Z)</option>
-                                <option value="title_desc" {{ request('sort') === 'title' && request('direction') === 'desc' ? 'selected' : '' }}>Judul (Z-A)</option>
-                                <option value="downloads_desc" {{ request('sort') === 'downloads_count' && request('direction') === 'desc' ? 'selected' : '' }}>Paling Populer</option>
-                                <option value="year_desc" {{ request('sort') === 'publication_year' && request('direction') === 'desc' ? 'selected' : '' }}>Terbaru</option>
-                            </select>
-                        </div>
+                       
                     </div>
                 </div>
 
