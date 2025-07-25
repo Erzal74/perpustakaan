@@ -97,10 +97,19 @@ Route::middleware(['auth', 'role:user'])->prefix('dashboard/user')->name('user.'
     // Live Search
     Route::get('/search', [UserController::class, 'search'])->name('search');
 
-    // Preview File - pastikan token optional
-    Route::get('/preview/{id}/{token?}', [UserController::class, 'preview'])
-        ->name('preview')
-        ->whereNumber('id'); // Validasi ID harus numeric
+    // Route untuk detail
+    Route::get('/detail/{id}/{token?}', [UserController::class, 'detail'])
+        ->name('detail')
+        ->whereNumber('id');
+
+    // Optional: Redirect dari preview ke detail untuk backward compatibility
+    Route::get('/preview/{id}/{token?}', function($id, $token = null) {
+        return redirect()->route('user.detail', ['id' => $id, 'token' => $token]);
+    })->name('preview')->whereNumber('id');
+
+    Route::get('/preview-file/{id}', [UserController::class, 'previewFile'])
+        ->name('preview-file')
+        ->whereNumber('id');
 });
 
 /*

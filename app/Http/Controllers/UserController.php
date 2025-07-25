@@ -173,6 +173,70 @@ class UserController extends Controller
         }
     }
 
+    public function previewFile($id)
+    {
+        try {
+            $softfile = Softfile::findOrFail($id);
+            $filePath = $softfile->file_path;
+
+            if (!Storage::disk('public')->exists($filePath)) {
+                abort(404, 'File tidak ditemukan');
+            }
+
+            $absolutePath = Storage::disk('public')->path($filePath);
+
+            $mimeType = Storage::mimeType($filePath);
+
+            return response()->file($absolutePath, [
+                'Content-Type' => $mimeType,
+                'Content-Disposition' => 'inline; filename="'.$softfile->original_filename.'"'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('File preview error: ' . $e->getMessage());
+            abort(500, 'Terjadi kesalahan saat memuat file');
+        }
+    }
+
+    public function detail($id, $token = null)
+    {
+        try {
+            $softfile = Softfile::withCount('downloads')->findOrFail($id);
+
+            // Verifikasi token jika disertakan
+            if ($token && $softfile->preview_token !== $token) {
+                abort(403, 'Token pratinjau tidak valid');
+            }
+
+            $relativePath = $softfile->file_path;
+            $fileExists = Storage::disk('public')->exists($relativePath);
+            $extension = strtolower(pathinfo($relativePath, PATHINFO_EXTENSION));
+            $fileUrl = asset('storage/' . $relativePath);
+
+            // Daftar ekstensi yang bisa dipratinjau di browser
+            $previewableInBrowser = [
+                'pdf', 'jpg', 'jpeg', 'png', 'gif', 'webp',
+                'txt', 'csv', 'rtf', 'xml', 'html', 'htm',
+                'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'
+            ];
+
+            $canPreview = $fileExists && in_array($extension, $previewableInBrowser);
+
+            return view('dashboard.user_detail', [
+                'softfile' => $softfile,
+                'fileExists' => $fileExists,
+                'safeFilePath' => $fileUrl,
+                'fileExtension' => $extension,
+                'previewToken' => $token,
+                'canPreview' => $canPreview
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Detail error: ' . $e->getMessage());
+            abort(500, 'Terjadi kesalahan saat memuat detail');
+        }
+    }
+
     private function detectMimeType($path)
     {
         if (!file_exists($path)) {
