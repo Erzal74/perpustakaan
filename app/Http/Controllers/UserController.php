@@ -15,6 +15,18 @@ use PhpOffice\PhpWord\Element\Text;
 
 class UserController extends Controller
 {
+    public static function formatBytes($bytes, $precision = 2)
+    {
+        if ($bytes <= 0) {
+            return '0 B';
+        }
+        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+        $pow = min($pow, count($units) - 1);
+        $bytes /= pow(1024, $pow);
+        return round($bytes, $precision) . ' ' . $units[$pow];
+    }
+
     public function index(Request $request)
     {
         $validSorts = ['title', 'author', 'publisher', 'publication_year', 'created_at', 'downloads_count'];
@@ -24,39 +36,40 @@ class UserController extends Controller
         $filter = $request->get('filter', 'all');
 
         $files = Softfile::query()
-            ->withCount(['downloads as downloads_count'])
-            ->when($search, function ($query) use ($search) {
-                $searchLower = strtolower($search);
-                $query->where(function ($q) use ($searchLower) {
-                    $q->whereRaw("LOWER(title) LIKE ?", ["%{$searchLower}%"])
-                        ->orWhereRaw("LOWER(author) LIKE ?", ["%{$searchLower}%"])
-                        ->orWhereRaw("LOWER(publisher) LIKE ?", ["%{$searchLower}%"])
-                        ->orWhereRaw("LOWER(isbn) LIKE ?", ["%{$searchLower}%"])
-                        ->orWhereRaw("LOWER(issn) LIKE ?", ["%{$searchLower}%"]);
-                });
-            })
-            ->when($filter, function ($query) {
-                switch (request()->get('filter')) {
-                    case 'popular':
-                        $query->orderBy('downloads_count', 'desc');
-                        break;
-                    case 'new':
-                        $query->where('created_at', '>=', now()->subDays(30));
-                        break;
-                    case 'recommended':
-                        if (Auth::check()) {
-                            $genres = Auth::user()->preferred_genres ?? [];
-                            $query->whereIn('genre', $genres);
-                        }
-                        break;
-                    case 'textbook':
-                        $query->where('category', 'textbook');
-                        break;
-                }
-            })
-            ->orderBy($sort, $direction)
-            ->paginate(10)
-            ->withQueryString();
+        ->select(['id', 'title', 'author', 'publisher', 'publication_date', 'isbn', 'issn', 'file_path', 'created_at', 'preview_token'])
+        ->withCount(['downloads as downloads_count'])
+        ->when($search, function ($query) use ($search) {
+            $searchLower = strtolower($search);
+            $query->where(function ($q) use ($searchLower) {
+                $q->whereRaw("LOWER(title) LIKE ?", ["%{$searchLower}%"])
+                    ->orWhereRaw("LOWER(author) LIKE ?", ["%{$searchLower}%"])
+                    ->orWhereRaw("LOWER(publisher) LIKE ?", ["%{$searchLower}%"])
+                    ->orWhereRaw("LOWER(isbn) LIKE ?", ["%{$searchLower}%"])
+                    ->orWhereRaw("LOWER(issn) LIKE ?", ["%{$searchLower}%"]);
+            });
+        })
+        ->when($filter, function ($query) {
+            switch (request()->get('filter')) {
+                case 'popular':
+                    $query->orderBy('downloads_count', 'desc');
+                    break;
+                case 'new':
+                    $query->where('created_at', '>=', now()->subDays(30));
+                    break;
+                case 'recommended':
+                    if (Auth::check()) {
+                        $genres = Auth::user()->preferred_genres ?? [];
+                        $query->whereIn('genre', $genres);
+                    }
+                    break;
+                case 'textbook':
+                    $query->where('category', 'textbook');
+                    break;
+            }
+        })
+        ->orderBy($sort, $direction)
+        ->paginate(10)
+        ->withQueryString();
 
         /** @var \App\Models\User|null $user */
         $user = Auth::user();
@@ -111,17 +124,70 @@ class UserController extends Controller
         return (($currentMonth - $lastMonth) / $lastMonth) * 100;
     }
 
+    public function showFile($id)
+    {
+        $file = Softfile::findOrFail($id);
+        $filePath = storage_path('app/public/' . $file->file_path);
+
+        if (!file_exists($filePath)) {
+            abort(404, 'File tidak ditemukan.');
+        }
+
+        $extension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+        $mimeTypes = [
+            'pdf' => 'application/pdf',
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'png' => 'image/png',
+            'gif' => 'image/gif',
+            'webp' => 'image/webp',
+            'doc' => 'application/msword',
+            'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        ];
+
+        if (!array_key_exists($extension, $mimeTypes)) {
+            abort(415, 'Format file tidak didukung untuk pratinjau.');
+        }
+
+        return response()->file($filePath, [
+            'Content-Type' => $mimeTypes[$extension],
+            'Content-Disposition' => 'inline; filename="' . basename($filePath) . '"',
+        ]);
+    }
+
     public function search(Request $request)
     {
         $keyword = $request->get('search');
 
         $files = Softfile::query()
+            ->select(['id', 'title', 'edition', 'author', 'publisher', 'publication_year', 'isbn', 'issn', 'preview_token', 'file_path', 'created_at'])
             ->where('title', 'ILIKE', "%{$keyword}%")
             ->orWhere('author', 'ILIKE', "%{$keyword}%")
             ->orWhere('publisher', 'ILIKE', "%{$keyword}%")
+            ->orWhere('isbn', 'ILIKE', "%{$keyword}%")
+            ->orWhere('issn', 'ILIKE', "%{$keyword}%")
             ->orderBy('title')
             ->limit(20)
-            ->get(['id', 'title', 'edition', 'author', 'publisher', 'publication_year', 'isbn', 'issn', 'preview_token']);
+            ->get()
+            ->map(function ($file) {
+                return [
+                    'id' => $file->id,
+                    'title' => $file->title,
+                    'edition' => $file->edition,
+                    'author' => $file->author,
+                    'publisher' => $file->publisher,
+                    'publication_year' => $file->publication_year,
+                    'isbn' => $file->isbn,
+                    'issn' => $file->issn,
+                    'preview_token' => $file->preview_token,
+                    'created_at' => $file->created_at,
+                    'downloads_count' => $file->downloadCount(),
+                    'file_extension' => strtolower(pathinfo($file->file_path, PATHINFO_EXTENSION)),
+                    'file_size' => Storage::disk('public')->exists($file->file_path)
+                        ? self::formatBytes(Storage::disk('public')->size($file->file_path))
+                        : '-',
+                ];
+            });
 
         return response()->json($files);
     }

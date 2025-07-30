@@ -103,6 +103,14 @@ Route::middleware(['auth', 'role:user'])->prefix('dashboard/user')->name('user.'
         ->whereNumber('id'); // Validasi ID harus numeric
 });
 
+Route::prefix('dashboard/user')->middleware(['auth'])->group(function () {
+    Route::get('/', [UserController::class, 'index'])->name('user.index');
+    Route::get('/download/{id}', [UserController::class, 'download'])->name('user.download');
+    Route::get('/preview/{id}', [UserController::class, 'preview'])->name('user.preview');
+    Route::get('/show-file/{id}', [UserController::class, 'showFile'])->name('user.show-file');
+    Route::get('/search', [UserController::class, 'search'])->name('user.search');
+});
+
 /*
 |--------------------------------------------------------------------------
 | API ROUTES untuk AJAX (Jika diperlukan)

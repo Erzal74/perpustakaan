@@ -248,13 +248,10 @@
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
-                                <!-- Kolom NO -->
                                 <th scope="col"
                                     class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16">
                                     NO
                                 </th>
-
-                                <!-- Kolom Judul Buku -->
                                 <th scope="col"
                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     <a href="{{ request()->fullUrlWithQuery(['sort' => 'title', 'direction' => request('sort') === 'title' && request('direction') === 'asc' ? 'desc' : 'asc']) }}"
@@ -274,8 +271,6 @@
                                         </span>
                                     </a>
                                 </th>
-
-                                <!-- Kolom Pengarang -->
                                 <th scope="col"
                                     class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     <a href="{{ request()->fullUrlWithQuery(['sort' => 'author', 'direction' => request('sort') === 'author' && request('direction') === 'asc' ? 'desc' : 'asc']) }}"
@@ -295,8 +290,6 @@
                                         </span>
                                     </a>
                                 </th>
-
-                                <!-- Kolom Popularity -->
                                 <th scope="col"
                                     class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     <a href="{{ request()->fullUrlWithQuery(['sort' => 'downloads_count', 'direction' => request('sort') === 'downloads_count' && request('direction') === 'asc' ? 'desc' : 'asc']) }}"
@@ -316,8 +309,6 @@
                                         </span>
                                     </a>
                                 </th>
-
-                                <!-- Kolom Penerbit -->
                                 <th scope="col"
                                     class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     <a href="{{ request()->fullUrlWithQuery(['sort' => 'publisher', 'direction' => request('sort') === 'publisher' && request('direction') === 'asc' ? 'desc' : 'asc']) }}"
@@ -337,8 +328,6 @@
                                         </span>
                                     </a>
                                 </th>
-
-                                <!-- Kolom Tahun -->
                                 <th scope="col"
                                     class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     <a href="{{ request()->fullUrlWithQuery(['sort' => 'publication_year', 'direction' => request('sort') === 'publication_year' && request('direction') === 'asc' ? 'desc' : 'asc']) }}"
@@ -358,29 +347,71 @@
                                         </span>
                                     </a>
                                 </th>
-
-                                <!-- Kolom Aksi -->
+                                <th scope="col"
+                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    ISBN
+                                </th>
+                                <th scope="col"
+                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    ISSN
+                                </th>
+                                <th scope="col"
+                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Ukuran File
+                                </th>
                                 <th scope="col"
                                     class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Aksi
                                 </th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-gray-200" id="softfileTable">
+                        <tbody class="divide-y divide-gray-200" id="softfileTable">
                             @forelse ($files as $file)
-                                <tr class="hover:bg-gray-50 transition-colors">
+                                <tr
+                                    class="{{ $loop->odd ? 'bg-gray-50' : 'bg-white' }} hover:bg-gray-100 transition-colors">
                                     <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                                         {{ ($files->currentPage() - 1) * $files->perPage() + $loop->iteration }}
                                     </td>
                                     <td class="px-6 py-4">
                                         <div class="flex items-center gap-3">
                                             <div
-                                                class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500"
-                                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                                                </svg>
+                                                class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0
+                    @if (strtolower(pathinfo($file->file_path, PATHINFO_EXTENSION)) === 'pdf') bg-red-100
+                    @elseif (in_array(strtolower(pathinfo($file->file_path, PATHINFO_EXTENSION)), ['jpg', 'jpeg', 'png', 'gif', 'webp']))
+                        bg-blue-100
+                    @elseif (in_array(strtolower(pathinfo($file->file_path, PATHINFO_EXTENSION)), ['doc', 'docx']))
+                        bg-green-100
+                    @else
+                        bg-gray-100 @endif">
+                                                @if (strtolower(pathinfo($file->file_path, PATHINFO_EXTENSION)) === 'pdf')
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500"
+                                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                    </svg>
+                                                @elseif (in_array(strtolower(pathinfo($file->file_path, PATHINFO_EXTENSION)), ['jpg', 'jpeg', 'png', 'gif', 'webp']))
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500"
+                                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                    </svg>
+                                                @elseif (in_array(strtolower(pathinfo($file->file_path, PATHINFO_EXTENSION)), ['doc', 'docx']))
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500"
+                                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                    </svg>
+                                                @else
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500"
+                                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                                    </svg>
+                                                @endif
                                             </div>
                                             <div class="flex-1 min-w-0">
                                                 <div class="flex items-center gap-2">
@@ -454,9 +485,36 @@
                                             <span class="text-gray-400">-</span>
                                         @endif
                                     </td>
+                                    <td class="px-4 py-4 text-sm text-gray-700">
+                                        <div class="max-w-[140px]">
+                                            <p class="truncate">{{ $file->isbn ?? '-' }}</p>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-4 text-sm text-gray-700">
+                                        <div class="max-w-[140px]">
+                                            <p class="truncate">{{ $file->issn ?? '-' }}</p>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-4 text-sm text-gray-700">
+                                        @if (Storage::disk('public')->exists($file->file_path))
+                                            <span
+                                                class="text-gray-700">{{ \App\Http\Controllers\UserController::formatBytes(Storage::disk('public')->size($file->file_path)) }}</span>
+                                        @else
+                                            <span class="text-gray-400">-</span>
+                                        @endif
+                                    </td>
                                     <td class="px-4 py-4 whitespace-nowrap text-sm space-x-2">
                                         <a href="{{ route('user.preview', ['id' => $file->id, 'token' => $file->preview_token]) }}"
                                             class="inline-flex items-center px-3 py-1.5 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            Detail
+                                        </a>
+                                        <a href="{{ route('user.show-file', $file->id) }}" target="_blank"
+                                            class="inline-flex items-center px-3 py-1.5 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-200">
                                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -465,7 +523,7 @@
                                                     d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
                                                 </path>
                                             </svg>
-                                            Lihat
+                                            Preview
                                         </a>
                                         <a href="{{ route('user.download', $file->id) }}"
                                             class="inline-flex items-center px-3 py-1.5 text-sm font-medium bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200">
@@ -646,100 +704,145 @@
 
                     data.forEach((item, index) => {
                         const popularBadge = item.downloads_count >= 50 ? `
-                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                                </svg>
-                                Populer
-                            </span>
-                        ` : '';
+        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+            </svg>
+            Populer
+        </span>
+    ` : '';
 
                         const newBadge = new Date(item.created_at) > new Date(Date.now() - 30 * 24 *
                             60 * 60 * 1000) ? `
-                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                </svg>
-                                Baru
-                            </span>
-                        ` : '';
+        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            Baru
+        </span>
+    ` : '';
+
+                        const fileIconClass = item.file_extension === 'pdf' ?
+                            'bg-red-100 text-red-500' : ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(
+                                item.file_extension) ? 'bg-blue-100 text-blue-500' : ['doc', 'docx']
+                            .includes(item.file_extension) ? 'bg-green-100 text-green-500' :
+                            'bg-gray-100 text-gray-500';
+
+                        const fileIcon = item.file_extension === 'pdf' ? `
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ${item.file_extension === 'pdf' ? 'text-red-500' : ''}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+    ` : ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(item.file_extension) ? `
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ${['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(item.file_extension) ? 'text-blue-500' : ''}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+    ` : ['doc', 'docx'].includes(item.file_extension) ? `
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ${['doc', 'docx'].includes(item.file_extension) ? 'text-green-500' : ''}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+    ` : `
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+        </svg>
+    `;
 
                         const row = `
-                    <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                            ${index + 1}
-                        </td>
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500"
-                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                                    </svg>
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <div class="flex items-center gap-2">
-                                        <p class="font-medium text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis">
-                                            ${item.title}
-                                        </p>
-                                        ${popularBadge}
-                                        ${newBadge}
-                                    </div>
-                                    <div class="mt-1 flex items-center text-xs text-gray-500">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
-                                        </svg>
-                                        <span>Diunduh ${item.downloads_count} kali bulan ini</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-4 py-4 text-sm text-gray-700">
-                            <div class="max-w-[150px]">
-                                <p class="truncate">${item.author ?? '-'}</p>
-                            </div>
-                        </td>
-                        <td class="px-4 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div class="w-full bg-gray-200 rounded-full h-2.5">
-                                    <div class="bg-blue-600 h-2.5 rounded-full"
-                                        style="width: ${Math.min(100, (item.downloads_count / ${Math.max(1, data.reduce((max, book) => Math.max(max, book.downloads_count), 0))}) * 100}%"></div>
-                                </div>
-                                <span class="ml-2 text-xs text-gray-500">${item.downloads_count}</span>
-                            </div>
-                        </td>
-                        <td class="px-4 py-4 text-sm text-gray-700">
-                            <div class="max-w-[140px]">
-                                <p class="truncate">${item.publisher ?? '-'}</p>
-                            </div>
-                        </td>
-                        <td class="px-4 py-4 whitespace-nowrap">
-                            ${item.publication_year ?
-                                `<span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
-                                        ${item.publication_year}
-                                    </span>` :
-                                '<span class="text-gray-400">-</span>'}
-                        </td>
-                        <td class="px-4 py-4 whitespace-nowrap text-sm space-x-2">
-                            <a href="/dashboard/user/preview/${item.id}?token=${item.preview_token}"
-                                class="inline-flex items-center px-3 py-1.5 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                </svg>
-                                Lihat
-                            </a>
-                            <a href="/dashboard/user/download/${item.id}"
-                                class="inline-flex items-center px-3 py-1.5 text-sm font-medium bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                </svg>
-                                Unduh
-                            </a>
-                        </td>
-                    </tr>
-                `;
+        <tr class="${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-gray-100 transition-colors">
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                ${index + 1}
+            </td>
+            <td class="px-6 py-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${fileIconClass}">
+                        ${fileIcon}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2">
+                            <p class="font-medium text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis">
+                                ${item.title}
+                            </p>
+                            ${popularBadge}
+                            ${newBadge}
+                        </div>
+                        <div class="mt-1 flex items-center text-xs text-gray-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+                            </svg>
+                            <span>Diunduh ${item.downloads_count} kali bulan ini</span>
+                        </div>
+                    </div>
+                </div>
+            </td>
+            <td class="px-4 py-4 text-sm text-gray-700">
+                <div class="max-w-[150px]">
+                    <p class="truncate">${item.author ?? '-'}</p>
+                </div>
+            </td>
+            <td class="px-4 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                        <div class="bg-blue-600 h-2.5 rounded-full"
+                            style="width: ${Math.min(100, (item.downloads_count / ${Math.max(1, data.reduce((max, book) => Math.max(max, book.downloads_count), 0))}) * 100)}%"></div>
+                    </div>
+                    <span class="ml-2 text-xs text-gray-500">${item.downloads_count}</span>
+                </div>
+            </td>
+            <td class="px-4 py-4 text-sm text-gray-700">
+                <div class="max-w-[140px]">
+                    <p class="truncate">${item.publisher ?? '-'}</p>
+                </div>
+            </td>
+            <td class="px-4 py-4 whitespace-nowrap">
+                ${item.publication_year ?
+                    `<span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+                                ${item.publication_year}
+                            </span>` :
+                    '<span class="text-gray-400">-</span>'}
+            </td>
+            <td class="px-4 py-4 text-sm text-gray-700">
+                <div class="max-w-[140px]">
+                    <p class="truncate">${item.isbn ?? '-'}</p>
+                </div>
+            </td>
+            <td class="px-4 py-4 text-sm text-gray-700">
+                <div class="max-w-[140px]">
+                    <p class="truncate">${item.issn ?? '-'}</p>
+                </div>
+            </td>
+            <td class="px-4 py-4 text-sm text-gray-700">
+                ${item.file_size ? `${item.file_size}` : '<span class="text-gray-400">-</span>'}
+            </td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm space-x-2">
+                <a href="/dashboard/user/preview/${item.id}?token=${item.preview_token}"
+                    class="inline-flex items-center px-3 py-1.5 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Detail
+                </a>
+                <a href="/dashboard/user/show-file/${item.id}"
+                    target="_blank"
+                    class="inline-flex items-center px-3 py-1.5 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-200">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                    </svg>
+                    Preview
+                </a>
+                <a href="/dashboard/user/download/${item.id}"
+                    class="inline-flex items-center px-3 py-1.5 text-sm font-medium bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Unduh
+                </a>
+            </td>
+        </tr>
+    `;
                         tableBody.innerHTML += row;
                     });
                 })
