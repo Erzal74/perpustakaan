@@ -124,9 +124,15 @@ class UserController extends Controller
         return (($currentMonth - $lastMonth) / $lastMonth) * 100;
     }
 
-    public function showFile($id)
+    public function showFile($id, Request $request)
     {
         $file = Softfile::findOrFail($id);
+
+        // Validasi token
+        if ($request->query('token') !== $file->preview_token) {
+            abort(403, 'Token pratinjau tidak valid.');
+        }
+
         $filePath = storage_path('app/public/' . $file->file_path);
 
         if (!file_exists($filePath)) {
@@ -143,6 +149,16 @@ class UserController extends Controller
             'webp' => 'image/webp',
             'doc' => 'application/msword',
             'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'csv' => 'text/csv',
+            'txt' => 'text/plain',
+            'rtf' => 'application/rtf',
+            'xml' => 'application/xml',
+            'html' => 'text/html',
+            'htm' => 'text/html',
+            'ppt' => 'application/vnd.ms-powerpoint',
+            'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            'xls' => 'application/vnd.ms-excel',
+            'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         ];
 
         if (!array_key_exists($extension, $mimeTypes)) {
@@ -157,86 +173,61 @@ class UserController extends Controller
 
     public function search(Request $request)
     {
-        $keyword = $request->get('search');
+        $keyword = $request->query('search');
+        $sort = $request->query('sort', 'title');
+        $direction = $request->query('direction', 'asc');
 
-        $files = Softfile::query()
-            ->select(['id', 'title', 'edition', 'author', 'publisher', 'publication_year', 'isbn', 'issn', 'preview_token', 'file_path', 'created_at'])
-            ->where('title', 'ILIKE', "%{$keyword}%")
-            ->orWhere('author', 'ILIKE', "%{$keyword}%")
-            ->orWhere('publisher', 'ILIKE', "%{$keyword}%")
-            ->orWhere('isbn', 'ILIKE', "%{$keyword}%")
-            ->orWhere('issn', 'ILIKE', "%{$keyword}%")
-            ->orderBy('title')
-            ->limit(20)
-            ->get()
-            ->map(function ($file) {
-                return [
-                    'id' => $file->id,
-                    'title' => $file->title,
-                    'edition' => $file->edition,
-                    'author' => $file->author,
-                    'publisher' => $file->publisher,
-                    'publication_year' => $file->publication_year,
-                    'isbn' => $file->isbn,
-                    'issn' => $file->issn,
-                    'preview_token' => $file->preview_token,
-                    'created_at' => $file->created_at,
-                    'downloads_count' => $file->downloadCount(),
-                    'file_extension' => strtolower(pathinfo($file->file_path, PATHINFO_EXTENSION)),
-                    'file_size' => Storage::disk('public')->exists($file->file_path)
-                        ? self::formatBytes(Storage::disk('public')->size($file->file_path))
-                        : '-',
-                ];
+        $query = Softfile::query();
+
+        if ($keyword) {
+            $query->where(function ($q) use ($keyword) {
+                $q->where('title', 'like', "%{$keyword}%")
+                ->orWhere('author', 'like', "%{$keyword}%")
+                ->orWhere('publisher', 'like', "%{$keyword}%");
             });
+        }
+
+        $files = $query->orderBy($sort, $direction)->get()->map(function ($file) {
+            return [
+                'id' => $file->id,
+                'title' => $file->title,
+                'author' => $file->author,
+                'publisher' => $file->publisher,
+                'publication_year' => $file->publication_year,
+                'isbn' => $file->isbn,
+                'issn' => $file->issn,
+                'downloads_count' => $file->downloads_count,
+                'created_at' => $file->created_at,
+                'preview_token' => $file->preview_token,
+                'file_extension' => strtolower(pathinfo($file->file_path, PATHINFO_EXTENSION)),
+                'file_size' => Storage::disk('public')->exists($file->file_path)
+                    ? $this->formatBytes(Storage::disk('public')->size($file->file_path))
+                    : '-',
+            ];
+        });
 
         return response()->json($files);
     }
 
-    public function preview(Request $request, $id)
+    public function preview($id, Request $request)
     {
-        try {
-            $softfile = Softfile::findOrFail($id);
+        $file = Softfile::findOrFail($id);
 
-            if ($request->has('token') && $softfile->preview_token !== $request->token) {
-                abort(403, 'Token pratinjau tidak valid');
-            }
-
-            $relativePath = $softfile->file_path;
-
-            if (!Storage::disk('public')->exists($relativePath)) {
-                abort(404, 'File tidak ditemukan');
-            }
-
-            $extension = strtolower(pathinfo($relativePath, PATHINFO_EXTENSION));
-            $fileUrl = asset('storage/' . $relativePath);
-
-            $previewableInBrowser = [
-                'pdf', 'jpg', 'jpeg', 'png', 'gif', 'webp',
-                'txt', 'csv', 'rtf', 'xml', 'html', 'htm',
-                'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'
-            ];
-
-            $allPreviewable = array_merge($previewableInBrowser, [
-                'odt', 'ods', 'odp', 'odg', 'odf',
-                'epub', 'mobi', 'fb2'
-            ]);
-
-            $canPreview = in_array($extension, $previewableInBrowser);
-
-            return view('dashboard.user_preview', [
-                'softfile' => $softfile,
-                'fileExists' => true,
-                'safeFilePath' => $fileUrl,
-                'fileExtension' => $extension,
-                'previewToken' => $softfile->preview_token ?? null,
-                'canPreview' => $canPreview,
-                'isPreviewable' => in_array($extension, $allPreviewable)
-            ]);
-
-        } catch (\Exception $e) {
-            Log::error('Preview error: ' . $e->getMessage());
-            abort(500, 'Terjadi kesalahan saat memuat pratinjau');
+        // Validasi token
+        if ($request->query('token') !== $file->preview_token) {
+            abort(403, 'Token pratinjau tidak valid.');
         }
+
+        $canPreview = in_array(
+            strtolower(pathinfo($file->file_path, PATHINFO_EXTENSION)),
+            ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'webp', 'doc', 'docx', 'txt', 'rtf', 'xml', 'html', 'htm', 'csv']
+        );
+
+        return view('dashboard.user_detail', [
+            'softfile' => $file,
+            'previewToken' => $request->query('token'),
+            'canPreview' => $canPreview,
+        ]);
     }
 
     private function detectMimeType($path)
