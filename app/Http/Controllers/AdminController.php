@@ -244,28 +244,28 @@ private function previewDoc($filePath, $filename)
         return $mime ?: 'application/octet-stream';
     }
 
-    public function destroy($id)
-    {
-        try {
-            $softfile = Softfile::findOrFail($id);
+public function destroy($id)
+{
+    try {
+        $softfile = Softfile::findOrFail($id);
 
-            if (Storage::disk('public')->exists($softfile->file_path)) {
-                Storage::disk('public')->delete($softfile->file_path);
-            }
-
-            $softfile->delete();
-
-            return redirect()
-                ->route('admin.index')
-                ->with('success', 'Buku berhasil dihapus');
-
-        } catch (\Exception $e) {
-            return redirect()
-                ->route('admin.index')
-                ->with('error', 'Gagal menghapus buku: ' . $e->getMessage());
+        if (Storage::disk('public')->exists($softfile->file_path)) {
+            Storage::disk('public')->delete($softfile->file_path);
         }
+
+        $softfile->delete();
+
+        return redirect()
+            ->route('admin.index')
+            ->with('success', 'Buku berhasil dihapus');
+
+    } catch (\Exception $e) {
+        return redirect()
+            ->route('admin.index')
+            ->with('error', 'Gagal menghapus buku: ' . $e->getMessage());
     }
-   public function bulkDestroy(Request $request)
+}
+public function bulkDestroy(Request $request)
 {
     $request->validate([
         'ids' => 'required|array',
@@ -285,12 +285,11 @@ private function previewDoc($filePath, $filename)
             }
         }
 
-        return back()->with('success', "Berhasil menghapus $count buku.");
+        return redirect()->route('admin.index')->with('success', "Berhasil menghapus $count buku.");
 
     } catch (\Exception $e) {
         Log::error('Bulk delete error: ' . $e->getMessage());
-        return back()->with('error', 'Gagal menghapus buku: ' . $e->getMessage());
+        return redirect()->route('admin.index')->with('error', 'Gagal menghapus buku: ' . $e->getMessage());
     }
 }
-
 }
