@@ -8,8 +8,10 @@
                 <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
                     <div class="flex items-center gap-4">
                         <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                             </svg>
                         </div>
                         <div>
@@ -18,9 +20,12 @@
                         </div>
                     </div>
 
-                    <a href="{{ route('admin.index') }}" class="inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-5 py-2 rounded-lg font-medium transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    <a href="{{ route('admin.index') }}"
+                        class="inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-5 py-2 rounded-lg font-medium transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                         </svg>
                         Kembali
                     </a>
@@ -32,7 +37,8 @@
                 <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
                     <div class="flex items-center gap-3">
                         <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                             </svg>
                         </div>
@@ -46,8 +52,10 @@
                 <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
                     <div class="flex items-center gap-3 mb-3">
                         <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-600" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
                         <span class="text-red-700 font-medium">Silakan perbaiki kesalahan berikut:</span>
@@ -72,69 +80,78 @@
                     @method('PUT')
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
-                        <!-- Left Column -->
+                        <!-- Kolom Kiri -->
                         <div class="space-y-5">
                             <div class="space-y-2">
                                 <label for="title" class="block text-sm font-medium text-gray-700">
                                     Judul Buku <span class="text-red-500">*</span>
                                 </label>
-                                <input type="text" name="title" id="title" value="{{ old('title', $softfile->title) }}" 
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200" required>
+                                <input type="text" name="title" id="title"
+                                    value="{{ old('title', $softfile->title) }}"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                                    required>
                             </div>
 
                             <div class="space-y-2">
                                 <label for="author" class="block text-sm font-medium text-gray-700">Pengarang</label>
-                                <input type="text" name="author" id="author" value="{{ old('author', $softfile->author) }}" 
+                                <input type="text" name="author" id="author"
+                                    value="{{ old('author', $softfile->author) }}"
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200">
                             </div>
 
                             <div class="space-y-2">
                                 <label for="publisher" class="block text-sm font-medium text-gray-700">Penerbit</label>
-                                <input type="text" name="publisher" id="publisher" value="{{ old('publisher', $softfile->publisher) }}" 
+                                <input type="text" name="publisher" id="publisher"
+                                    value="{{ old('publisher', $softfile->publisher) }}"
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200">
                             </div>
 
                             <div class="space-y-2">
-                                <label for="publication_date" class="block text-sm font-medium text-gray-700">Tahun Terbit</label>
-                                <input type="month" name="publication_date" id="publication_date" 
-                                    value="{{ old('publication_date', $softfile->publication_date ? date('Y-m', strtotime($softfile->publication_date)) : '') }}" 
+                                <label for="publication_date" class="block text-sm font-medium text-gray-700">Tahun
+                                    Terbit</label>
+                                <input type="month" name="publication_date" id="publication_date"
+                                    value="{{ old('publication_date', $softfile->publication_date ? date('Y-m', strtotime($softfile->publication_date)) : '') }}"
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200">
                             </div>
                         </div>
 
-                        <!-- Right Column -->
+                        <!-- Kolom Kanan -->
                         <div class="space-y-5">
                             <div class="space-y-2">
                                 <label for="isbn" class="block text-sm font-medium text-gray-700">ISBN</label>
-                                <input type="text" name="isbn" id="isbn" value="{{ old('isbn', $softfile->isbn) }}" 
+                                <input type="text" name="isbn" id="isbn"
+                                    value="{{ old('isbn', $softfile->isbn) }}"
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200">
                             </div>
 
                             <div class="space-y-2">
                                 <label for="issn" class="block text-sm font-medium text-gray-700">ISSN</label>
-                                <input type="text" name="issn" id="issn" value="{{ old('issn', $softfile->issn) }}" 
+                                <input type="text" name="issn" id="issn"
+                                    value="{{ old('issn', $softfile->issn) }}"
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200">
                             </div>
 
                             <div class="space-y-2">
                                 <label for="edition" class="block text-sm font-medium text-gray-700">Edisi</label>
-                                <input type="text" name="edition" id="edition" value="{{ old('edition', $softfile->edition) }}" 
+                                <input type="text" name="edition" id="edition"
+                                    value="{{ old('edition', $softfile->edition) }}"
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200">
                             </div>
 
                             <div class="space-y-2">
                                 <label for="genre" class="block text-sm font-medium text-gray-700">Genre</label>
-                                <input type="text" name="genre" id="genre" value="{{ old('genre', $softfile->genre) }}" 
+                                <input type="text" name="genre" id="genre"
+                                    value="{{ old('genre', $softfile->genre) }}"
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200">
                             </div>
                         </div>
                     </div>
 
-                    <!-- Description -->
+                    <!-- Deskripsi -->
                     <div class="px-6 pb-6">
                         <label for="description" class="block text-sm font-medium text-gray-700 mb-2">Deskripsi</label>
-                        <textarea name="description" id="description" rows="4" 
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200" 
+                        <textarea name="description" id="description" rows="4"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
                             placeholder="Masukkan deskripsi buku...">{{ old('description', $softfile->description) }}</textarea>
                     </div>
 
@@ -145,19 +162,25 @@
                             @if ($softfile->file_path && Storage::disk('public')->exists($softfile->file_path))
                                 <div class="flex items-center gap-3">
                                     <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600"
+                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                         </svg>
                                     </div>
                                     <div class="flex-1">
-                                        <p class="text-sm font-medium text-gray-800">{{ $softfile->original_filename }}</p>
+                                        <p class="text-sm font-medium text-gray-800">{{ $softfile->original_filename }}
+                                        </p>
                                         <p class="text-xs text-gray-500">File saat ini</p>
                                     </div>
-                                    <a href="{{ route('admin.softfiles.preview', ['id' => $softfile->id, 'token' => $softfile->preview_token]) }}" target="_blank" 
+                                    <a href="{{ route('admin.softfiles.preview', ['id' => $softfile->id, 'token' => $softfile->preview_token]) }}" target="_blank"
                                         class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                         </svg>
                                         Preview
                                     </a>
@@ -165,38 +188,45 @@
                             @else
                                 <div class="flex items-center gap-3">
                                     <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-600"
+                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
                                     </div>
                                     <div>
                                         <p class="text-sm font-medium text-red-700">File tidak ditemukan</p>
-                                        <p class="text-xs text-red-500">File asli mungkin telah dihapus atau dipindahkan</p>
+                                        <p class="text-xs text-red-500">File asli mungkin telah dihapus atau dipindahkan
+                                        </p>
                                     </div>
                                 </div>
                             @endif
+
                             <div class="mt-4">
                                 <label for="filename" class="block text-sm font-medium text-gray-700 mb-2">
-                                    Ubah nama file (tanpa ekstensi)
+                                    Ubah nama file (tanpa ekstensi) <span class="text-red-500">*</span>
                                 </label>
-                                <input type="text" name="filename" id="filename" 
-                                    value="{{ old('filename', pathinfo($softfile->original_filename, PATHINFO_FILENAME)) }}" 
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200">
-                                <p class="text-xs text-gray-500 mt-1">Masukkan nama file baru sesuai keinginan. Ekstensi akan ditambahkan otomatis.</p>
+                                <input type="text" name="filename" id="filename"
+                                    value="{{ old('filename', pathinfo($softfile->original_filename, PATHINFO_FILENAME)) }}"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                                    required>
+                                <p class="text-xs text-gray-500 mt-1">Gunakan hanya huruf (a-z, A-Z), angka (0-9), underscore (_), tanda hubung (-), titik (.), dan spasi.</p>
                             </div>
                         </div>
                     </div>
 
                     <!-- Action Buttons -->
                     <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
-                        <a href="{{ route('admin.index') }}" 
+                        <a href="{{ route('admin.index') }}"
                             class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200">
                             Batal
                         </a>
-                        <button type="submit" 
+                        <button type="submit"
                             class="inline-flex items-center justify-center gap-2 px-6 py-2 border border-transparent rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200 font-medium">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7" />
                             </svg>
                             Simpan Perubahan
                         </button>
