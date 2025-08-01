@@ -238,52 +238,62 @@ class AdminController extends Controller
     }
 
     public function destroy($id)
-    {
-        try {
-            $softfile = Softfile::findOrFail($id);
+{
+    try {
+        $softfile = Softfile::findOrFail($id);
 
-            if (Storage::disk('public')->exists($softfile->file_path)) {
-                Storage::disk('public')->delete($softfile->file_path);
-            }
+        // Hapus relasi di tabel downloads
+        $softfile->downloads()->delete();
 
-            $softfile->delete();
-
-            return redirect()
-                ->route('admin.index')
-                ->with('success', 'Buku berhasil dihapus');
-
-        } catch (\Exception $e) {
-            return redirect()
-                ->route('admin.index')
-                ->with('error', 'Gagal menghapus buku: ' . $e->getMessage());
+        if (Storage::disk('public')->exists($softfile->file_path)) {
+            Storage::disk('public')->delete($softfile->file_path);
         }
+
+        $softfile->delete();
+
+        return redirect()
+            ->route('admin.index')
+            ->with('success', 'Buku berhasil dihapus');
+
+    } catch (\Exception $e) {
+        return redirect()
+            ->route('admin.index')
+            ->with('error', 'Gagal menghapus buku: ' . $e->getMessage());
     }
+}
 
     public function bulkDestroy(Request $request)
-    {
-        $request->validate([
-            'ids' => 'required|array',
-            'ids.*' => 'exists:softfiles,id',
-        ]);
+{
+    $request->validate([
+        'ids' => 'required|array',
+        'ids.*' => 'exists:softfiles,id',
+    ]);
 
-        try {
-            $count = 0;
-            foreach ($request->ids as $id) {
-                $file = Softfile::find($id);
-                if ($file) {
-                    if (Storage::disk('public')->exists($file->file_path)) {
-                        Storage::disk('public')->delete($file->file_path);
-                    }
-                    $file->delete();
-                    $count++;
+    try {
+        $count = 0;
+        foreach ($request->ids as $id) {
+            $file = Softfile::find($id);
+            if ($file) {
+                // 🔥 Hapus data relasi di downloads
+                $file->downloads()->delete();
+
+                // 🔥 Hapus file fisik dari storage
+                if (Storage::disk('public')->exists($file->file_path)) {
+                    Storage::disk('public')->delete($file->file_path);
                 }
+
+                // 🔥 Hapus data dari tabel softfiles
+                $file->delete();
+                $count++;
             }
-
-            return redirect()->route('admin.index')->with('success', "Berhasil menghapus $count buku.");
-
-        } catch (\Exception $e) {
-            Log::error('Bulk delete error: ' . $e->getMessage());
-            return redirect()->route('admin.index')->with('error', 'Gagal menghapus buku: ' . $e->getMessage());
         }
+
+        return redirect()->route('admin.index')->with('success', "Berhasil menghapus $count buku.");
+
+    } catch (\Exception $e) {
+        Log::error('Bulk delete error: ' . $e->getMessage());
+        return redirect()->route('admin.index')->with('error', 'Gagal menghapus buku: ' . $e->getMessage());
     }
+}
+
 }

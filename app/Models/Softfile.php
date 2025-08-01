@@ -64,10 +64,14 @@ class Softfile extends Model
         return $pdfDocument->preview_token;
     }
     // Add this to your Softfile model
+
+
+// App\Models\Softfile.php
 public function downloads()
 {
-    return $this->hasMany(Download::class);
+    return $this->hasMany(\App\Models\Download::class, 'softfile_id');
 }
+
 
 public function downloadCount()
 {

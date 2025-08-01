@@ -6,6 +6,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\SuperAdminController;
 
+
 /*
 |--------------------------------------------------------------------------
 | WEB ROUTES
@@ -13,7 +14,13 @@ use App\Http\Controllers\SuperAdminController;
 */
 
 // ⛔ Redirect ke halaman login jika akses root
-Route::get('/', fn () => redirect()->route('login'));
+Route::get('/', function () {
+    if (Auth::check()) {
+        return redirect()->route('redirect'); // redirect ke dashboard berdasarkan role
+    }
+
+    return redirect()->route('login');
+});
 
 // ✅ Auth Routes (Breeze): login, register, etc.
 require __DIR__ . '/auth.php';
