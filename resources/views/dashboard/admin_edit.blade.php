@@ -75,7 +75,8 @@
                     <p class="text-gray-600 mt-1">Lengkapi informasi buku yang akan diperbarui</p>
                 </div>
 
-                <form action="{{ route('admin.softfiles.update', $softfile->id) }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('admin.softfiles.update', $softfile->id) }}" method="POST"
+                    enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
 
@@ -93,22 +94,29 @@
                             </div>
 
                             <div class="space-y-2">
-                                <label for="author" class="block text-sm font-medium text-gray-700">Pengarang</label>
+                                <label for="author" class="block text-sm font-medium text-gray-700">
+                                    Pengarang <span class="text-red-500">*</span>
+                                </label>
                                 <input type="text" name="author" id="author"
                                     value="{{ old('author', $softfile->author) }}"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200">
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                                    required>
                             </div>
 
                             <div class="space-y-2">
-                                <label for="publisher" class="block text-sm font-medium text-gray-700">Penerbit</label>
+                                <label for="publisher" class="block text-sm font-medium text-gray-700">
+                                    Penerbit <span class="text-red-500">*</span>
+                                </label>
                                 <input type="text" name="publisher" id="publisher"
                                     value="{{ old('publisher', $softfile->publisher) }}"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200">
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                                    required>
                             </div>
 
                             <div class="space-y-2">
-                                <label for="publication_date" class="block text-sm font-medium text-gray-700">Tahun
-                                    Terbit</label>
+                                <label for="publication_date" class="block text-sm font-medium text-gray-700">
+                                    Tahun Terbit
+                                </label>
                                 <input type="month" name="publication_date" id="publication_date"
                                     value="{{ old('publication_date', $softfile->publication_date ? date('Y-m', strtotime($softfile->publication_date)) : '') }}"
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200">
@@ -160,7 +168,7 @@
                         <label class="block text-sm font-medium text-gray-700 mb-2">File Buku</label>
                         <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
                             @if ($softfile->file_path && Storage::disk('public')->exists($softfile->file_path))
-                                <div class="flex items-center gap-3">
+                                <div class="flex items-center gap-3 mb-4">
                                     <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600"
                                             fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -173,8 +181,9 @@
                                         </p>
                                         <p class="text-xs text-gray-500">File saat ini</p>
                                     </div>
-                                    <a href="{{ route('admin.softfiles.preview', ['id' => $softfile->id, 'token' => $softfile->preview_token]) }}" target="_blank"
-                                        class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm">
+                                    <button type="button" data-id="{{ $softfile->id }}"
+                                        data-token="{{ $softfile->preview_token }}"
+                                        class="preview-button inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
                                             viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -183,10 +192,10 @@
                                                 d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                         </svg>
                                         Preview
-                                    </a>
+                                    </button>
                                 </div>
                             @else
-                                <div class="flex items-center gap-3">
+                                <div class="flex items-center gap-3 mb-4">
                                     <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-600"
                                             fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -202,6 +211,25 @@
                                 </div>
                             @endif
 
+                            <div class="space-y-2">
+                                <label for="file" class="block text-sm font-medium text-gray-700 mb-2">
+                                    Ganti File Buku (opsional)
+                                </label>
+                                <div
+                                    class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 mx-auto mb-4"
+                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                    </svg>
+                                    <input type="file" name="file" id="file"
+                                        accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.jpg,.png"
+                                        class="w-full text-gray-600 file:border-0 file:bg-blue-50 file:text-blue-700 file:px-4 file:py-2 file:rounded-lg file:cursor-pointer file:font-medium hover:file:bg-blue-100 transition-colors" />
+                                    <p class="text-gray-500 text-sm mt-2">Pilih file PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX,
+                                        TXT, CSV, JPG, atau PNG (maks 20MB)</p>
+                                </div>
+                            </div>
+
                             <div class="mt-4">
                                 <label for="filename" class="block text-sm font-medium text-gray-700 mb-2">
                                     Ubah nama file (tanpa ekstensi) <span class="text-red-500">*</span>
@@ -210,7 +238,8 @@
                                     value="{{ old('filename', pathinfo($softfile->original_filename, PATHINFO_FILENAME)) }}"
                                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
                                     required>
-                                <p class="text-xs text-gray-500 mt-1">Gunakan hanya huruf (a-z, A-Z), angka (0-9), underscore (_), tanda hubung (-), titik (.), dan spasi.</p>
+                                <p class="text-xs text-gray-500 mt-1">Gunakan hanya huruf (a-z, A-Z), angka (0-9),
+                                    underscore (_), tanda hubung (-), titik (.), dan spasi.</p>
                             </div>
                         </div>
                     </div>
@@ -235,4 +264,64 @@
             </div>
         </div>
     </div>
+
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const previewModal = document.getElementById('preview-modal');
+                const previewTitle = document.getElementById('preview-title');
+                const previewContent = document.getElementById('preview-content');
+                const closePreview = document.getElementById('close-preview');
+
+                document.querySelectorAll('.preview-button').forEach(button => {
+                    button.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const id = this.dataset.id;
+                        const token = this.dataset.token;
+
+                        fetch(`{{ route('admin.softfiles.preview', ['id' => ':id']) }}?token=${token}`
+                                .replace(':id', id), {
+                                    headers: {
+                                        'Accept': 'application/json'
+                                    }
+                                })
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error(`HTTP error! status: ${response.status}`);
+                                }
+                                return response.json();
+                            })
+                            .then(data => {
+                                if (data.error) {
+                                    alert(data.error);
+                                    return;
+                                }
+
+                                previewTitle.textContent = `Preview: ${data.filename || 'File'}`;
+                                previewContent.innerHTML = data.html;
+                                previewModal.classList.remove('hidden');
+                            })
+                            .catch(error => {
+                                console.error('Error fetching preview:', error);
+                                alert('Gagal memuat pratinjau: ' + error.message);
+                            });
+                    });
+                });
+
+                closePreview.addEventListener('click', function() {
+                    previewModal.classList.add('hidden');
+                    previewContent.innerHTML = '';
+                    previewTitle.textContent = '';
+                });
+
+                previewModal.addEventListener('click', function(e) {
+                    if (e.target === previewModal) {
+                        previewModal.classList.add('hidden');
+                        previewContent.innerHTML = '';
+                        previewTitle.textContent = '';
+                    }
+                });
+            });
+        </script>
+    @endpush
 @endsection
