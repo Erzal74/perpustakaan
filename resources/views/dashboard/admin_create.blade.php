@@ -88,25 +88,25 @@
                                 </label>
                                 <input type="text" name="title" id="title" value="{{ old('title') }}"
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
-                                    placeholder="Masukkan judul buku">
+                                    placeholder="Masukkan judul buku" required>
                             </div>
 
                             <div>
                                 <label for="author" class="block text-sm font-medium text-gray-700 mb-2">
-                                    Pengarang
+                                    Pengarang <span class="text-red-500">*</span>
                                 </label>
                                 <input type="text" name="author" id="author" value="{{ old('author') }}"
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
-                                    placeholder="Masukkan nama pengarang">
+                                    placeholder="Masukkan nama pengarang" required>
                             </div>
 
                             <div>
                                 <label for="publisher" class="block text-sm font-medium text-gray-700 mb-2">
-                                    Penerbit
+                                    Penerbit <span class="text-red-500">*</span>
                                 </label>
                                 <input type="text" name="publisher" id="publisher" value="{{ old('publisher') }}"
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
-                                    placeholder="Masukkan nama penerbit">
+                                    placeholder="Masukkan nama penerbit" required>
                             </div>
 
                             <div>
@@ -134,7 +134,7 @@
                                 <label for="isbn" class="block text-sm font-medium text-gray-700 mb-2">
                                     ISBN
                                 </label>
-                                <input type="number" name="isbn" id="isbn" value="{{ old('isbn') }}"
+                                <input type="text" name="isbn" id="isbn" value="{{ old('isbn') }}"
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
                                     placeholder="Masukkan nomor ISBN">
                             </div>
@@ -143,7 +143,7 @@
                                 <label for="issn" class="block text-sm font-medium text-gray-700 mb-2">
                                     ISSN
                                 </label>
-                                <input type="number" name="issn" id="issn" value="{{ old('issn') }}"
+                                <input type="text" name="issn" id="issn" value="{{ old('issn') }}"
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
                                     placeholder="Masukkan nomor ISSN">
                             </div>
@@ -169,15 +169,17 @@
                                             d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                                     </svg>
                                     <input type="file" name="file" id="file" required
+                                        accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.jpg,.png"
                                         class="w-full text-gray-600 file:border-0 file:bg-blue-50 file:text-blue-700 file:px-4 file:py-2 file:rounded-lg file:cursor-pointer file:font-medium hover:file:bg-blue-100 transition-colors" />
-                                    <p class="text-gray-500 text-sm mt-2">Pilih file PDF, DOC, atau DOCX</p>
+                                    <p class="text-gray-500 text-sm mt-2">Pilih file PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX,
+                                        TXT, CSV, JPG, atau PNG (maks 20MB)</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Full Width Fields -->
-                    <div class="mt-8">
+                    <div class="mt-8 px-6">
                         <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
                             Deskripsi
                         </label>
@@ -187,7 +189,8 @@
                     </div>
 
                     <!-- Action Buttons -->
-                    <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-end">
+                    <div
+                        class="mt-8 px-6 py-4 bg-gray-50 border-t border-gray-200 flex flex-col sm:flex-row gap-4 justify-end">
                         <a href="{{ route('admin.index') }}"
                             class="inline-flex items-center justify-center gap-2 px-6 py-3 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200 font-medium">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"

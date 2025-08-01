@@ -162,9 +162,9 @@
                 </div>
 
                 <div class="overflow-x-auto">
-                <form id="bulk-form" method="POST" action="{{ route('admin.softfiles.bulk') }}">
-                    @csrf
-                    @method('DELETE')
+                    <form id="bulk-form" method="POST" action="{{ route('admin.softfiles.bulk') }}">
+                        @csrf
+                        @method('DELETE')
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
@@ -361,9 +361,9 @@
                                         </td>
 
                                         <td class="px-4 py-4 whitespace-nowrap">
-                                            <a href="{{ route('admin.softfiles.preview', ['id' => $file->id, 'token' => $file->preview_token]) }}"
-                                                class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm"
-                                                target="_blank">
+                                            <button data-id="{{ $file->id }}"
+                                                data-token="{{ $file->preview_token }}"
+                                                class="preview-button inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
                                                     viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -372,7 +372,7 @@
                                                         d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                                 </svg>
                                                 <span class="sr-only">Preview</span>
-                                            </a>
+                                            </button>
                                         </td>
 
                                         <td class="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -387,25 +387,23 @@
                                                             d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                                     </svg>
                                                 </a>
-                                <!-- Pastikan form bulk delete memiliki action yang benar -->
-                                <form id="bulk-form" method="POST" action="{{ route('admin.softfiles.bulk') }}">
-                                    @csrf
-                                    @method('DELETE')
-                                    <!-- Table content -->
-                                </form>
 
-                                            <!-- Untuk tombol delete individual -->
-                                            <form action="{{ route('admin.softfiles.destroy', $file->id) }}" method="POST" class="inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="button" onclick="confirmDelete(this)" 
-                                                    class="text-red-600 hover:text-red-900 p-1 sm:p-2 rounded-md hover:bg-red-50 transition-colors" 
-                                                    title="Hapus">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                    </svg>
-                                                </button>
-                                            </form>
+                                                <form action="{{ route('admin.softfiles.destroy', $file->id) }}"
+                                                    method="POST" class="inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="button" onclick="confirmDelete(this)"
+                                                        class="text-red-600 hover:text-red-900 p-1 sm:p-2 rounded-md hover:bg-red-50 transition-colors"
+                                                        title="Hapus">
+                                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                                            class="h-4 w-4 sm:h-5 sm:w-5" fill="none"
+                                                            viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                        </svg>
+                                                    </button>
+                                                </form>
                                             </div>
                                         </td>
                                     </tr>
@@ -449,6 +447,25 @@
                         {{ $files->withQueryString()->links() }}
                     </div>
                 @endif
+
+                <!-- Modal untuk Preview -->
+                <div id="preview-modal"
+                    class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
+                    <div class="bg-white rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] overflow-auto">
+                        <div class="p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h2 id="preview-title" class="text-xl font-bold"></h2>
+                                <button id="close-preview" class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <div id="preview-content" class="overflow-auto"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -463,6 +480,10 @@
             const bulkForm = document.getElementById('bulk-form');
             const selectAllCheckbox = document.getElementById('select-all');
             const selectedCount = document.getElementById('selected-count');
+            const previewModal = document.getElementById('preview-modal');
+            const previewTitle = document.getElementById('preview-title');
+            const previewContent = document.getElementById('preview-content');
+            const closePreview = document.getElementById('close-preview');
 
             function updateBulkUI() {
                 const checkboxes = document.querySelectorAll('input.item-checkbox[name="ids[]"]');
@@ -489,37 +510,84 @@
                 }
             });
 
-        bulkDeleteBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const checked = document.querySelectorAll('input.item-checkbox[name="ids[]"]:checked');
+            bulkDeleteBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const checked = document.querySelectorAll('input.item-checkbox[name="ids[]"]:checked');
 
-            if (checked.length === 0) {
-                alert('Pilih setidaknya satu item untuk dihapus.');
-                return;
-            }
+                if (checked.length === 0) {
+                    alert('Pilih setidaknya satu item untuk dihapus.');
+                    return;
+                }
 
-            if (confirm(`Anda yakin ingin menghapus ${checked.length} item yang dipilih?`)) {
-                bulkForm.submit();
-            }
-        });
+                if (confirm(`Anda yakin ingin menghapus ${checked.length} item yang dipilih?`)) {
+                    bulkForm.submit();
+                }
+            });
 
-            // Initialize
-            updateBulkUI();
-        });
+            // Preview functionality
+            document.querySelectorAll('.preview-button').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const id = this.dataset.id;
+                    const token = this.dataset.token;
 
-        function confirmDelete(formButton) {
-            if (confirm('Yakin ingin menghapus buku ini?')) {
-                // Cari form terdekat dan submit
-                const form = formButton.closest('form');
-                if (form) {
-                    form.submit();
+                    fetch(`{{ route('admin.softfiles.preview', ['id' => ':id']) }}?token=${token}`
+                            .replace(':id', id), {
+                                headers: {
+                                    'Accept': 'application/json'
+                                }
+                            })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.error) {
+                                alert(data.error);
+                                return;
+                            }
+
+                            previewTitle.textContent = `Preview: ${data.filename || 'File'}`;
+                            previewContent.innerHTML = data.html;
+                            previewModal.classList.remove('hidden');
+                        })
+                        .catch(error => {
+                            console.error('Error fetching preview:', error);
+                            alert('Gagal memuat pratinjau: ' + error.message);
+                        });
+                });
+            });
+
+            closePreview.addEventListener('click', function() {
+                previewModal.classList.add('hidden');
+                previewContent.innerHTML = '';
+                previewTitle.textContent = '';
+            });
+
+            // Close modal when clicking outside
+            previewModal.addEventListener('click', function(e) {
+                if (e.target === previewModal) {
+                    previewModal.classList.add('hidden');
+                    previewContent.innerHTML = '';
+                    previewTitle.textContent = '';
+                }
+            });
+
+            function confirmDelete(formButton) {
+                if (confirm('Yakin ingin menghapus buku ini?')) {
+                    const form = formButton.closest('form');
+                    if (form) {
+                        form.submit();
+                    }
                 }
             }
-        }
 
-        function dismissNotification(id) {
-            document.getElementById(id).remove();
-        }
+            function dismissNotification(id) {
+                document.getElementById(id).remove();
+            }
+        });
     </script>
 
     <style>

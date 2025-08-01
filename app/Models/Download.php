@@ -11,7 +11,7 @@ class Download extends Model
 
     public function softfile()
     {
-        return $this->belongsTo(Softfile::class);
+        return $this->belongsTo(Softfile::class, 'softfile_id');
     }
 
     public function user()
