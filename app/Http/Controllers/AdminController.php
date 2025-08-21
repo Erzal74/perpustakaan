@@ -19,11 +19,11 @@ class AdminController extends Controller
             ->when($searchQuery, function ($query) use ($searchQuery) {
                 $searchQuery = strtolower($searchQuery);
                 $query->where(function($q) use ($searchQuery) {
-                    $q->whereRaw("LOWER(title) LIKE ?", ["{$searchQuery}%"])
-                      ->orWhereRaw("LOWER(author) LIKE ?", ["{$searchQuery}%"])
-                      ->orWhereRaw("LOWER(publisher) LIKE ?", ["{$searchQuery}%"])
-                      ->orWhereRaw("LOWER(isbn) LIKE ?", ["{$searchQuery}%"])
-                      ->orWhereRaw("LOWER(issn) LIKE ?", ["{$searchQuery}%"]);
+                        $q->whereRaw("LOWER(title) LIKE ?", ["{$searchQuery}%"])
+                        ->orWhereRaw("LOWER(author) LIKE ?", ["{$searchQuery}%"])
+                        ->orWhereRaw("LOWER(publisher) LIKE ?", ["{$searchQuery}%"])
+                        ->orWhereRaw("LOWER(isbn) LIKE ?", ["{$searchQuery}%"])
+                        ->orWhereRaw("LOWER(issn) LIKE ?", ["{$searchQuery}%"]);
                 });
             })
             ->when(request('sort'), function ($query) use ($sortField, $sortDirection) {
@@ -191,10 +191,18 @@ class AdminController extends Controller
                 return $this->previewCsv($fullPath, $softfile->original_filename);
             }
 
-            if (in_array($extension, ['doc', 'docx'])) {
-                return $this->previewDoc($fullPath, $softfile->original_filename);
+            // Tambahkan handling untuk doc, docx, xls, xlsx, ppt, pptx menggunakan Google Docs
+            if (in_array($extension, ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'])) {
+                if (in_array($extension, ['xls', 'xlsx'])) {
+                    return $this->previewExcel($fullPath, $softfile->original_filename);
+                } elseif (in_array($extension, ['ppt', 'pptx'])) {
+                    return $this->previewPpt($fullPath, $softfile->original_filename);
+                } else {
+                    return $this->previewDoc($fullPath, $softfile->original_filename);
+                }
             }
 
+            // Untuk format lain (pdf, txt, dll.), tampilkan inline
             return response()->file($fullPath, [
                 'Content-Type' => $mime,
                 'Content-Disposition' => 'inline; filename="'.$softfile->original_filename.'"'
@@ -228,6 +236,28 @@ class AdminController extends Controller
         ]);
     }
 
+    private function previewExcel($filePath, $filename)
+    {
+        $publicUrl = asset('storage/' . str_replace('storage/app/public/', '', $filePath));
+        $googleDocsUrl = "https://docs.google.com/gview?url=" . urlencode($publicUrl) . "&embedded=true";
+
+        return view('previews.excel', [
+            'googleDocsUrl' => $googleDocsUrl,
+            'filename' => $filename
+        ]);
+    }
+
+    private function previewPpt($filePath, $filename)
+    {
+        $publicUrl = asset('storage/' . str_replace('storage/app/public/', '', $filePath));
+        $googleDocsUrl = "https://docs.google.com/gview?url=" . urlencode($publicUrl) . "&embedded=true";
+
+        return view('previews.ppt', [
+            'googleDocsUrl' => $googleDocsUrl,
+            'filename' => $filename
+        ]);
+    }
+
     private function detectMimeType($path)
     {
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
@@ -237,63 +267,61 @@ class AdminController extends Controller
         return $mime ?: 'application/octet-stream';
     }
 
-public function destroy($id)
-{
-    try {
-        $softfile = Softfile::findOrFail($id);
+    public function destroy($id)
+    {
+        try {
+            $softfile = Softfile::findOrFail($id);
 
-        // Hapus semua data di downloads yang terkait
-        \DB::table('downloads')->where('softfile_id', $softfile->id)->delete();
+            // Hapus semua data di downloads yang terkait
+            \DB::table('downloads')->where('softfile_id', $softfile->id)->delete();
 
-        // Hapus file fisik
-        if (Storage::disk('public')->exists($softfile->file_path)) {
-            Storage::disk('public')->delete($softfile->file_path);
-        }
-
-        // Hapus record softfile
-        $softfile->delete();
-
-        return redirect()
-            ->route('admin.index')
-            ->with('success', 'Buku berhasil dihapus');
-
-    } catch (\Exception $e) {
-        return redirect()
-            ->route('admin.index')
-            ->with('error', 'Gagal menghapus buku: ' . $e->getMessage());
-    }
-}
-
-public function bulkDestroy(Request $request)
-{
-    $request->validate([
-        'ids' => 'required|array',
-        'ids.*' => 'exists:softfiles,id',
-    ]);
-
-    try {
-        $count = 0;
-        foreach ($request->ids as $id) {
-            $file = Softfile::find($id);
-            if ($file) {
-                // Hapus semua data di downloads yang terkait
-                \DB::table('downloads')->where('softfile_id', $file->id)->delete();
-
-                // Hapus file fisik
-                if (Storage::disk('public')->exists($file->file_path)) {
-                    Storage::disk('public')->delete($file->file_path);
-                }
-
-                // Hapus record softfile
-                $file->delete();
-                $count++;
+            // Hapus file fisik
+            if (Storage::disk('public')->exists($softfile->file_path)) {
+                Storage::disk('public')->delete($softfile->file_path);
             }
+
+            // Hapus record softfile
+            $softfile->delete();
+
+            return redirect()
+                ->route('admin.index')
+                ->with('success', 'Buku berhasil dihapus');
+
+        } catch (\Exception $e) {
+            return redirect()
+                ->route('admin.index')
+                ->with('error', 'Gagal menghapus buku: ' . $e->getMessage());
         }
+    }
 
-        return redirect()->route('admin.index')->with('success', "Berhasil menghapus $count buku.");
+    public function bulkDestroy(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:softfiles,id',
+        ]);
 
-    } catch (\Exception $e) {
-        Log::error('Bulk delete error: ' . $e->getMessage());
+        try {
+            $count = 0;
+            foreach ($request->ids as $id) {
+                $file = Softfile::find($id);
+                if ($file) {
+                    // Hapus semua data di downloads yang terkait
+                    \DB::table('downloads')->where('softfile_id', $file->id)->delete();
+
+                    // Hapus file fisik
+                    if (Storage::disk('public')->exists($file->file_path)) {
+                        Storage::disk('public')->delete($file->file_path);
+                    }
+
+                    // Hapus record softfile
+                    $file->delete();
+                    $count++;
+                }
+            }
+            return redirect()->route('admin.index')->with('success', "Berhasil menghapus $count buku.");
+        } catch (\Exception $e) {
+            Log::error('Bulk delete error: ' . $e->getMessage());
         return redirect()->route('admin.index')->with('error', 'Gagal menghapus buku: ' . $e->getMessage());
     }
   }
