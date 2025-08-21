@@ -39,6 +39,16 @@
     @endphp
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <!-- Back Button -->
+        <div class="mb-6">
+            <a href="{{ url()->previous() }}"
+                class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg shadow-sm
+                text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2
+                focus:ring-offset-2 focus:ring-indigo-500 transition">
+                ← Kembali
+            </a>
+        </div>
+
         <!-- Book Header Section -->
         <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
             <div class="md:flex">
