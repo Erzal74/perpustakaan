@@ -53,6 +53,7 @@ Route::middleware(['auth', 'role:superadmin'])->prefix('dashboard/superadmin')->
     Route::delete('/reject/{id}', [SuperAdminController::class, 'reject'])->name('reject');
     Route::post('/disable/{id}', [SuperAdminController::class, 'disable'])->name('disable');
     Route::post('/enable/{id}', [SuperAdminController::class, 'enable'])->name('enable');
+    Route::delete('/delete/{id}', [SuperAdminController::class, 'delete'])->name('delete');
 });
 
 /*
@@ -80,7 +81,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('dashboard/admin')->name('admi
 
 
 /*
-|--------------------------------------------------------------------------
+|-------------------------------------------------------------------------
 | USER ROUTES
 |--------------------------------------------------------------------------
 | Role: user (lihat & download softfile)

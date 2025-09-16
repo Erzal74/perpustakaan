@@ -112,4 +112,17 @@ class SuperAdminController extends Controller
 
         return view('dashboard.admin-list', compact('admins'));
     }
+
+    public function delete($id)
+    {
+        $user = User::findOrFail($id);
+
+        if ($user->id === Auth::id()) {
+            return back()->with('error', 'Anda tidak bisa menghapus akun sendiri.');
+        }
+
+        $user->forceDelete();
+
+        return back()->with('success', 'User berhasil dihapus permanen.');
+    }
 }

@@ -6,6 +6,7 @@ use App\Models\Softfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB; // Added to resolve Undefined type 'DB' error
 
 class AdminController extends Controller
 {
@@ -273,7 +274,7 @@ class AdminController extends Controller
             $softfile = Softfile::findOrFail($id);
 
             // Hapus semua data di downloads yang terkait
-            \DB::table('downloads')->where('softfile_id', $softfile->id)->delete();
+            DB::table('downloads')->where('softfile_id', $softfile->id)->delete();
 
             // Hapus file fisik
             if (Storage::disk('public')->exists($softfile->file_path)) {
@@ -307,7 +308,7 @@ class AdminController extends Controller
                 $file = Softfile::find($id);
                 if ($file) {
                     // Hapus semua data di downloads yang terkait
-                    \DB::table('downloads')->where('softfile_id', $file->id)->delete();
+                    DB::table('downloads')->where('softfile_id', $file->id)->delete();
 
                     // Hapus file fisik
                     if (Storage::disk('public')->exists($file->file_path)) {
@@ -322,7 +323,7 @@ class AdminController extends Controller
             return redirect()->route('admin.index')->with('success', "Berhasil menghapus $count buku.");
         } catch (\Exception $e) {
             Log::error('Bulk delete error: ' . $e->getMessage());
-        return redirect()->route('admin.index')->with('error', 'Gagal menghapus buku: ' . $e->getMessage());
+            return redirect()->route('admin.index')->with('error', 'Gagal menghapus buku: ' . $e->getMessage());
+        }
     }
-  }
 }
