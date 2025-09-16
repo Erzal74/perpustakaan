@@ -66,17 +66,23 @@ class SuperAdminController extends Controller
         }
 
         $validated = $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|string|email|max:255|unique:users',
-        'password' => 'required|string|min:8',
-        'role' => 'required|in:admin,superadmin'
+            'name' => 'required|string|max:255',
+            'nip' => [
+                'required',
+                'string',
+                'size:8', // HARUS tepat 8 digit
+                'regex:/^\d{8}$/', // hanya angka, 8 digit
+                'unique:users,email', // simpan di kolom email, jadi cek uniqueness di kolom email
+            ],
+            'password' => 'required|string|min:8',
+            'role' => 'required|in:admin,superadmin'
         ]);
 
         try {
             // Buat user baru
             User::create([
                 'name' => $validated['name'],
-                'email' => $validated['email'],
+                'email' => $validated['nip'], // simpan NIP ke kolom email
                 'password' => Hash::make($validated['password']),
                 'role' => $validated['role'],
                 'status' => 'approved',

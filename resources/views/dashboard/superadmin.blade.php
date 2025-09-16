@@ -363,9 +363,16 @@
                                 class="mt-1 block w-full border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-blue-500 focus:border-blue-500 transition">
                         </div>
                         <div>
-                            <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                            <input type="email" name="email" id="email" required
-                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-blue-500 focus:border-blue-500 transition">
+                            <label for="nip" class="block text-sm font-medium text-gray-700">NIP (8 digit)</label>
+                            <input type="text" 
+                                name="nip" 
+                                id="nip" 
+                                required 
+                                maxlength="8"
+                                pattern="\d{1,8}"
+                                title="Hanya boleh diisi angka, maksimal 8 digit"
+                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-blue-500 focus:border-blue-500 transition"
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                         </div>
                         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>

@@ -32,7 +32,7 @@ class AdminController extends Controller
             }, function ($query) {
                 $query->latest();
             })
-            ->paginate(10);
+            ->paginate(5);
 
         return view('dashboard.admin', compact('files'));
     }

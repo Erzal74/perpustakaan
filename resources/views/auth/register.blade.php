@@ -67,10 +67,10 @@
                 @enderror
             </div>
 
-            <!-- Email Field -->
+            <!-- NIP Field (sebelumnya Email) -->
             <div class="space-y-2">
                 <label for="email" class="block text-sm font-semibold text-gray-700 transition-all duration-200">
-                    Email Address
+                    NIP
                 </label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center">
@@ -80,9 +80,13 @@
                             </path>
                         </svg>
                     </div>
-                    <input id="email" name="email" type="email" required value="{{ old('email') }}"
+                    <input id="email" name="email" type="text" required value="{{ old('email') }}"
                         class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white @error('email') border-red-500 @enderror"
-                        placeholder="nama@email.com" />
+                        placeholder="Masukkan NIP (8 digit angka)"
+                        maxlength="8"
+                        pattern="\d*"
+                        inputmode="numeric"
+                        title="Hanya boleh angka, maksimal 8 digit" />
                 </div>
                 @error('email')
                     <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
@@ -165,20 +169,33 @@
     </div>
 
     <script>
+        // Fungsi toggle password (jika kamu pakai di form, meskipun belum ada eye icon di HTML)
         function togglePassword(fieldId) {
             const passwordField = document.getElementById(fieldId);
             const eyeIcon = document.getElementById('eye-icon-' + fieldId);
             const eyeOffIcon = document.getElementById('eye-off-icon-' + fieldId);
 
-            if (passwordField.type === 'password') {
-                passwordField.type = 'text';
-                eyeIcon.classList.add('hidden');
-                eyeOffIcon.classList.remove('hidden');
-            } else {
-                passwordField.type = 'password';
-                eyeIcon.classList.remove('hidden');
-                eyeOffIcon.classList.add('hidden');
+            if (passwordField && eyeIcon && eyeOffIcon) {
+                if (passwordField.type === 'password') {
+                    passwordField.type = 'text';
+                    eyeIcon.classList.add('hidden');
+                    eyeOffIcon.classList.remove('hidden');
+                } else {
+                    passwordField.type = 'password';
+                    eyeIcon.classList.remove('hidden');
+                    eyeOffIcon.classList.add('hidden');
+                }
             }
         }
+
+        // Optional: Batasi input NIP hanya angka (fallback jika pattern tidak didukung)
+        document.addEventListener('DOMContentLoaded', function () {
+            const nipInput = document.getElementById('email');
+            if (nipInput) {
+                nipInput.addEventListener('input', function (e) {
+                    this.value = this.value.replace(/[^0-9]/g, '').slice(0, 8);
+                });
+            }
+        });
     </script>
 </x-guest-layout>

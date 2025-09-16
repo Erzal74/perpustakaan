@@ -42,24 +42,28 @@
         <form method="POST" action="{{ route('login') }}" class="space-y-6">
             @csrf
 
-            <!-- Email Field -->
-            <div class="space-y-2">
-                <label for="email" class="block text-sm font-semibold text-gray-700 transition-all duration-200">
-                    Email Address
-                </label>
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center">
-                        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207">
-                            </path>
-                        </svg>
+            <!-- NIP Field -->
+                <div class="space-y-2">
+                    <label for="email" class="block text-sm font-semibold text-gray-700 transition-all duration-200">
+                        NIP
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center">
+                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M16 12a4 4 0 11-8 0 4 4 0 018 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207">
+                                </path>
+                            </svg>
+                        </div>
+                        <input id="email" name="email" type="text" required autofocus
+                            class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
+                            placeholder="Masukkan NIP (8 digit)"
+                            maxlength="8"
+                            pattern="\d{8}" 
+                            title="Harus tepat 8 digit angka"
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 8)" />
                     </div>
-                    <input id="email" name="email" type="email" required autofocus
-                        class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
-                        placeholder="nama@email.com" />
                 </div>
-            </div>
 
             <!-- Password Field -->
             <div class="space-y-2">
