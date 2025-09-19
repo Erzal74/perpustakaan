@@ -138,149 +138,193 @@
             </div>
 
             <!-- Data Table -->
-            <div class="mx-6 mb-6">
-                <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-                    <div class="px-6 py-4 border-b border-gray-200">
-                        <h3 class="text-lg font-semibold text-gray-800">Daftar Administrator</h3>
-                        <p class="text-gray-600 text-sm mt-1">Kelola akses dan peran administrator sistem</p>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16">
-                                        NO</th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[250px]">
-                                        Admin</th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
-                                        Email</th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Role</th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Status</th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                @forelse ($admins as $admin)
-                                    <tr class="hover:bg-gray-50 transition">
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {{ $loop->iteration }}</td>
-                                        <td class="px-6 py-4 min-w-[250px]">
-                                            <div class="flex items-center gap-3">
-                                                <div
-                                                    class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 {{ $admin->role === 'superadmin' ? 'bg-purple-100 text-purple-600' : 'bg-blue-100 text-blue-600' }} font-medium">
-                                                    {{ strtoupper(substr($admin->name, 0, 1)) }}
-                                                </div>
-                                                <div class="flex-1 min-w-0">
-                                                    <p class="font-medium text-gray-900 truncate"
-                                                        title="{{ $admin->name }}">{{ $admin->name }}</p>
-                                                    <p class="text-xs text-gray-500 mt-1">Terdaftar:
-                                                        {{ $admin->created_at->diffForHumans() }}</p>
-                                                    <p class="text-xs text-gray-500 mt-1 sm:hidden">{{ $admin->email }}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="px-6 py-4 text-sm text-gray-700 hidden sm:table-cell">
-                                            <div class="max-w-[200px] truncate">{{ $admin->email }}</div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span
-                                                class="px-2 py-1 text-xs font-medium rounded-full {{ $admin->role === 'superadmin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800' }}">
+                <div class="mx-6 mb-6">
+                    <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+                        <div class="px-6 py-4 border-b border-gray-200">
+                            <h3 class="text-lg font-semibold text-gray-800">Daftar Administrator</h3>
+                            <p class="text-gray-600 text-sm mt-1">Kelola akses dan peran administrator sistem</p>
+                        </div>
+
+                        <!-- Mobile Card View -->
+                        <div class="md:hidden">
+                            @forelse ($admins as $admin)
+                                <div class="p-6 border-b border-gray-200 last:border-b-0 bg-white">
+                                    <div class="flex items-center gap-3 mb-4">
+                                        <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 {{ $admin->role === 'superadmin' ? 'bg-purple-100 text-purple-600' : 'bg-blue-100 text-blue-600' }} font-medium">
+                                            {{ strtoupper(substr($admin->name, 0, 1)) }}
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="font-medium text-gray-900 truncate" title="{{ $admin->name }}">{{ $admin->name }}</p>
+                                            <p class="text-xs text-gray-500 mt-1">Terdaftar: {{ $admin->created_at->diffForHumans() }}</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="space-y-3">
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-sm font-medium text-gray-500">Email</span>
+                                            <span class="text-sm text-gray-900">{{ $admin->email }}</span>
+                                        </div>
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-sm font-medium text-gray-500">Role</span>
+                                            <span class="px-2 py-1 text-xs font-medium rounded-full {{ $admin->role === 'superadmin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800' }}">
                                                 {{ ucfirst($admin->role) }}
                                             </span>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span
-                                                class="px-2 py-1 text-xs font-medium rounded-full {{ $admin->status === 'approved' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
+                                        </div>
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-sm font-medium text-gray-500">Status</span>
+                                            <span class="px-2 py-1 text-xs font-medium rounded-full {{ $admin->status === 'approved' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
                                                 {{ $admin->status === 'approved' ? 'Aktif' : 'Nonaktif' }}
                                             </span>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                                            <div class="flex justify-center gap-2">
-                                                @if ($admin->id !== Auth::id())
-                                                    @if ($admin->status === 'approved')
-                                                        <form action="{{ route('superadmin.disable', $admin->id) }}"
-                                                            method="POST">
-                                                            @csrf
-                                                            <button type="submit"
-                                                                class="p-2 text-red-600 hover:text-red-700 rounded-md hover:bg-red-50 transition"
-                                                                title="Nonaktifkan">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
-                                                                    fill="none" viewBox="0 0 24 24"
-                                                                    stroke="currentColor">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                                        stroke-width="2"
-                                                                        d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636M5.636 18.364l12.728-12.728" />
-                                                                </svg>
-                                                            </button>
-                                                        </form>
-                                                    @else
-                                                        <form action="{{ route('superadmin.enable', $admin->id) }}"
-                                                            method="POST">
-                                                            @csrf
-                                                            <button type="submit"
-                                                                class="p-2 text-green-600 hover:text-green-700 rounded-md hover:bg-green-50 transition"
-                                                                title="Aktifkan">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
-                                                                    fill="none" viewBox="0 0 24 24"
-                                                                    stroke="currentColor">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                                        stroke-width="2"
-                                                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                                </svg>
-                                                            </button>
-                                                        </form>
-                                                    @endif
-                                                @else
-                                                    <span
-                                                        class="px-2 py-1 text-xs text-gray-500 bg-gray-100 rounded-full">Current
-                                                        User</span>
-                                                @endif
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @empty
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-4 flex justify-center gap-2">
+                                        @if ($admin->id !== Auth::id())
+                                            @if ($admin->status === 'approved')
+                                                <form action="{{ route('superadmin.disable', $admin->id) }}" method="POST">
+                                                    @csrf
+                                                    <button type="submit"
+                                                        class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-md transition">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                        </svg>
+                                                        Nonaktifkan
+                                                    </button>
+                                                </form>
+                                            @else
+                                                <form action="{{ route('superadmin.enable', $admin->id) }}" method="POST">
+                                                    @csrf
+                                                    <button type="submit"
+                                                        class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-green-600 bg-green-50 hover:bg-green-100 rounded-md transition">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                        </svg>
+                                                        Aktifkan
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        @else
+                                            <span class="px-2 py-1 text-xs text-gray-500 bg-gray-100 rounded-full">Current User</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="p-12 text-center">
+                                    <div class="flex flex-col items-center justify-center">
+                                        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                                            </svg>
+                                        </div>
+                                        <h3 class="text-lg font-medium text-gray-800 mb-2">Belum ada admin</h3>
+                                        <p class="text-gray-500 mb-4">Mulai dengan menambahkan admin pertama</p>
+                                        <button onclick="openCreateAdminModal()"
+                                            class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium text-sm">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                            </svg>
+                                            Tambah Admin
+                                        </button>
+                                    </div>
+                                </div>
+                            @endforelse
+                        </div>
+
+                        <!-- Desktop Table View -->
+                        <div class="hidden md:block overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
                                     <tr>
-                                        <td colspan="6" class="px-6 py-16 text-center">
-                                            <div class="flex flex-col items-center justify-center">
-                                                <div
-                                                    class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400"
-                                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-                                                    </svg>
-                                                </div>
-                                                <h3 class="text-lg font-medium text-gray-800 mb-2">Belum ada admin</h3>
-                                                <p class="text-gray-500 mb-4">Mulai dengan menambahkan admin pertama</p>
-                                                <button onclick="openCreateAdminModal()"
-                                                    class="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md font-medium text-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
-                                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2" d="M12 4v16m8-8H4" />
-                                                    </svg>
-                                                    Tambah Admin
-                                                </button>
-                                            </div>
-                                        </td>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16">NO</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[250px]">ADMIN</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">EMAIL</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ROLE</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">STATUS</th>
+                                        <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">ACTIONS</th>
                                     </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    @forelse ($admins as $admin)
+                                        <tr class="hover:bg-gray-50 transition">
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $loop->iteration }}</td>
+                                            <td class="px-6 py-4 min-w-[250px]">
+                                                <div class="flex items-center gap-3">
+                                                    <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 {{ $admin->role === 'superadmin' ? 'bg-purple-100 text-purple-600' : 'bg-blue-100 text-blue-600' }} font-medium">
+                                                        {{ strtoupper(substr($admin->name, 0, 1)) }}
+                                                    </div>
+                                                    <div class="flex-1 min-w-0">
+                                                        <p class="font-medium text-gray-900 truncate" title="{{ $admin->name }}">{{ $admin->name }}</p>
+                                                        <p class="text-xs text-gray-500 mt-1">Terdaftar: {{ $admin->created_at->diffForHumans() }}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4 text-sm text-gray-700 hidden sm:table-cell">
+                                                <div class="max-w-[200px] truncate">{{ $admin->email }}</div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span class="px-2 py-1 text-xs font-medium rounded-full {{ $admin->role === 'superadmin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800' }}">
+                                                    {{ ucfirst($admin->role) }}
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span class="px-2 py-1 text-xs font-medium rounded-full {{ $admin->status === 'approved' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
+                                                    {{ $admin->status === 'approved' ? 'Aktif' : 'Nonaktif' }}
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                                                <div class="flex justify-center gap-2">
+                                                    @if ($admin->id !== Auth::id())
+                                                        @if ($admin->status === 'approved')
+                                                            <form action="{{ route('superadmin.disable', $admin->id) }}" method="POST">
+                                                                @csrf
+                                                                <button type="submit" class="p-2 text-red-600 hover:text-red-700 rounded-md hover:bg-red-50 transition" title="Nonaktifkan">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636M5.636 18.364l12.728-12.728" />
+                                                                    </svg>
+                                                                </button>
+                                                            </form>
+                                                        @else
+                                                            <form action="{{ route('superadmin.enable', $admin->id) }}" method="POST">
+                                                                @csrf
+                                                                <button type="submit" class="p-2 text-green-600 hover:text-green-700 rounded-md hover:bg-green-50 transition" title="Aktifkan">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                    </svg>
+                                                                </button>
+                                                            </form>
+                                                        @endif
+                                                    @else
+                                                        <span class="px-2 py-1 text-xs text-gray-500 bg-gray-100 rounded-full">Current User</span>
+                                                    @endif
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="6" class="px-6 py-16 text-center">
+                                                <div class="flex flex-col items-center justify-center">
+                                                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                                                        </svg>
+                                                    </div>
+                                                    <h3 class="text-lg font-medium text-gray-800 mb-2">Belum ada admin</h3>
+                                                    <p class="text-gray-500 mb-4">Mulai dengan menambahkan admin pertama</p>
+                                                    <button onclick="openCreateAdminModal()" class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium text-sm">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                                        </svg>
+                                                        Tambah Admin
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
-            </div>
 
             <!-- Create Admin Modal -->
             <div id="createAdminModal"
@@ -376,6 +420,42 @@
         </script>
 
         <style>
+
+            /* Ensure table cells don't force horizontal scroll on mobile */
+@media (max-width: 767px) {
+    .min-w-full {
+        min-width: 100% !important;
+    }
+
+    table th,
+    table td {
+        word-break: break-word;
+        white-space: normal !important;
+    }
+
+    /* Make sure long text wraps */
+    .truncate {
+        white-space: normal !important;
+        overflow: visible !important;
+        text-overflow: clip !important;
+    }
+
+    /* Adjust padding for better mobile fit */
+    .px-6 {
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+    }
+
+    .py-4 {
+        padding-top: 0.75rem !important;
+        padding-bottom: 0.75rem !important;
+    }
+
+    /* Reduce font size slightly on mobile */
+    .text-sm {
+        font-size: 0.8125rem !important;
+    }
+}
             .animate-fade-in {
                 animation: fadeIn 0.3s ease-in-out;
             }
@@ -391,6 +471,42 @@
                     transform: translateY(0);
                 }
             }
+
+            /* Ensure table cells don't force horizontal scroll on mobile */
+@media (max-width: 767px) {
+    .min-w-full {
+        min-width: 100% !important;
+    }
+
+    table th,
+    table td {
+        word-break: break-word;
+        white-space: normal !important;
+    }
+
+    /* Make sure long text wraps */
+    .truncate {
+        white-space: normal !important;
+        overflow: visible !important;
+        text-overflow: clip !important;
+    }
+
+    /* Adjust padding for better mobile fit */
+    .px-6 {
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+    }
+
+    .py-4 {
+        padding-top: 0.75rem !important;
+        padding-bottom: 0.75rem !important;
+    }
+
+    /* Reduce font size slightly on mobile */
+    .text-sm {
+        font-size: 0.8125rem !important;
+    }
+}
         </style>
     @endpush
 @endsection
