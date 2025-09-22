@@ -6,7 +6,7 @@
             <!-- Header Section -->
             <div class="bg-blue-700 px-6 py-5 border-b border-gray-200">
                 <div class="flex items-center justify-between">
-                    <h2 class="text-xl font-semibold text-black">User Management Dashboard</h2>
+                    <h2 class="text-xl font-semibold text-white">User Management Dashboard</h2>
                     <div class="flex space-x-3">
                         <span
                             class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
@@ -440,7 +440,7 @@
                     <form action="{{ route('superadmin.disable', $user->id) }}" method="POST">
                         @csrf
                         <button type="submit"
-                            class="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-white bg-gray-600 rounded-lg hover:bg-gray-700 focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition">
+                            class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium text-white bg-gray-600 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 transition">
                             <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" />
                             </svg>
@@ -451,8 +451,7 @@
                     <form action="{{ route('superadmin.enable', $user->id) }}" method="POST">
                         @csrf
                         <button type="submit"
-                            class="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition"
-                            title="Aktifkan user">
+                            class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium text-white bg-green-600 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition">
                             <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M3 10a7 7 0 1114 0A7 7 0 013 10zm7-4a1 1 0 00-1 1v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7a1 1 0 00-1-1z" />
                             </svg>
@@ -464,8 +463,7 @@
                         @csrf
                         @method('DELETE')
                         <button type="submit"
-                            class="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 transition"
-                            title="Hapus user permanen">
+                            class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 transition">
                             <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                             </svg>
