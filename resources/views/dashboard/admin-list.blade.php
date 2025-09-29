@@ -15,7 +15,7 @@
                             </svg>
                         </div>
                         <div>
-                            <h1 class="text-xl font-semibold text-black">Admin & Superadmin Management</h1>
+                            <h1 class="text-xl font-semibold text-white">Admin & Superadmin Management</h1>
                             <p class="text-blue-100 text-sm mt-1">Kelola akses dan peran administrator sistem</p>
                         </div>
                     </div>
@@ -117,7 +117,7 @@
                             </div>
                             <input type="text" name="search" value="{{ request('search') }}"
                                 class="block w-full pl-10 pr-12 py-2 border border-gray-300 rounded-md bg-white shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
-                                placeholder="Cari nama admin, email...">
+                                placeholder="Cari nama admin, NIP...">
                             <div class="absolute inset-y-0 right-0 flex items-center pr-2">
                                 @if (request('search'))
                                     <button type="button"
@@ -161,8 +161,8 @@
 
                                     <div class="space-y-3">
                                         <div class="flex justify-between items-center">
-                                            <span class="text-sm font-medium text-gray-500">Email</span>
-                                            <span class="text-sm text-gray-900">{{ $admin->email }}</span>
+                                            <span class="text-sm font-medium text-gray-500">NIP</span>
+                                            <span class="text-sm text-gray-900 font-mono">{{ $admin->nip ?? $admin->email }}</span>
                                         </div>
                                         <div class="flex justify-between items-center">
                                             <span class="text-sm font-medium text-gray-500">Role</span>
@@ -237,7 +237,7 @@
                                     <tr>
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16">NO</th>
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[250px]">ADMIN</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">EMAIL</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">NIP</th>
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ROLE</th>
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">STATUS</th>
                                         <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">ACTIONS</th>
@@ -259,7 +259,7 @@
                                                 </div>
                                             </td>
                                             <td class="px-6 py-4 text-sm text-gray-700 hidden sm:table-cell">
-                                                <div class="max-w-[200px] truncate">{{ $admin->email }}</div>
+                                                <div class="max-w-[200px] font-mono">{{ $admin->nip ?? $admin->email }}</div>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <span class="px-2 py-1 text-xs font-medium rounded-full {{ $admin->role === 'superadmin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800' }}">
@@ -342,7 +342,7 @@
                             </svg>
                         </button>
                     </div>
-                    <form action="{{ route('superadmin.create-admin') }}" method="POST">
+                    <form action="{{ route('superadmin.create-admin') }}" method="POST" onsubmit="return validateForm()">
                         @csrf
                         <div class="space-y-4">
                             <div>
@@ -351,22 +351,30 @@
                                     class="mt-1 block w-full border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-blue-500 focus:border-blue-500 transition">
                             </div>
                             <div>
-                                <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                                <input type="email" name="email" id="email" required
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-blue-500 focus:border-blue-500 transition">
+                                <label for="nip" class="block text-sm font-medium text-gray-700">NIP (Nomor Induk Pegawai)</label>
+                                <input type="text" name="nip" id="nip" required maxlength="8" pattern="[0-9]{8}"
+                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-blue-500 focus:border-blue-500 transition font-mono"
+                                    placeholder="Masukkan 8 digit angka"
+                                    oninput="validateNIP(this)"
+                                    onkeypress="return onlyNumbers(event)">
+                                <div id="nipError" class="text-red-500 text-xs mt-1 hidden">NIP harus berupa 8 digit angka</div>
+                                <div id="nipSuccess" class="text-green-500 text-xs mt-1 hidden">✓ NIP valid</div>
                             </div>
                             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div>
                                     <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                                    <input type="password" name="password" id="password" required
+                                    <input type="password" name="password" id="password" required minlength="6"
                                         class="mt-1 block w-full border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-blue-500 focus:border-blue-500 transition">
                                 </div>
                                 <div>
                                     <label for="password_confirmation"
                                         class="block text-sm font-medium text-gray-700">Konfirmasi Password</label>
                                     <input type="password" name="password_confirmation" id="password_confirmation"
-                                        required
-                                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-blue-500 focus:border-blue-500 transition">
+                                        required minlength="6"
+                                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-blue-500 focus:border-blue-500 transition"
+                                        oninput="checkPasswordMatch()">
+                                    <div id="passwordError" class="text-red-500 text-xs mt-1 hidden">Password tidak sama</div>
+                                    <div id="passwordSuccess" class="text-green-500 text-xs mt-1 hidden">✓ Password sama</div>
                                 </div>
                             </div>
                             <div>
@@ -382,8 +390,8 @@
                         <div class="mt-6 flex justify-end space-x-3">
                             <button type="button" onclick="closeCreateAdminModal()"
                                 class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 transition">Batal</button>
-                            <button type="submit"
-                                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">Tambah</button>
+                            <button type="submit" id="submitBtn"
+                                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition disabled:opacity-50 disabled:cursor-not-allowed">Tambah</button>
                         </div>
                     </form>
                 </div>
@@ -405,6 +413,117 @@
                 modal.classList.remove('opacity-100');
                 setTimeout(() => modal.classList.add('hidden'), 300);
                 document.body.classList.remove('overflow-hidden');
+                
+                // Reset form
+                document.getElementById('name').value = '';
+                document.getElementById('nip').value = '';
+                document.getElementById('password').value = '';
+                document.getElementById('password_confirmation').value = '';
+                document.getElementById('role').value = '';
+                
+                // Hide error messages
+                document.getElementById('nipError').classList.add('hidden');
+                document.getElementById('nipSuccess').classList.add('hidden');
+                document.getElementById('passwordError').classList.add('hidden');
+                document.getElementById('passwordSuccess').classList.add('hidden');
+            }
+
+            function onlyNumbers(event) {
+                const charCode = event.which ? event.which : event.keyCode;
+                if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+                    return false;
+                }
+                return true;
+            }
+
+            function validateNIP(input) {
+                const nipValue = input.value;
+                const nipError = document.getElementById('nipError');
+                const nipSuccess = document.getElementById('nipSuccess');
+                
+                // Remove any non-numeric characters
+                input.value = nipValue.replace(/[^0-9]/g, '');
+                
+                if (input.value.length === 0) {
+                    nipError.classList.add('hidden');
+                    nipSuccess.classList.add('hidden');
+                    return false;
+                }
+                
+                if (input.value.length > 8) {
+                    input.value = input.value.substring(0, 8);
+                }
+                
+                if (input.value.length === 8 && /^\d{8}$/.test(input.value)) {
+                    nipError.classList.add('hidden');
+                    nipSuccess.classList.remove('hidden');
+                    return true;
+                } else {
+                    nipError.classList.remove('hidden');
+                    nipSuccess.classList.add('hidden');
+                    return false;
+                }
+            }
+
+            function checkPasswordMatch() {
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('password_confirmation').value;
+                const passwordError = document.getElementById('passwordError');
+                const passwordSuccess = document.getElementById('passwordSuccess');
+                
+                if (confirmPassword === '') {
+                    passwordError.classList.add('hidden');
+                    passwordSuccess.classList.add('hidden');
+                    return;
+                }
+                
+                if (password === confirmPassword) {
+                    passwordError.classList.add('hidden');
+                    passwordSuccess.classList.remove('hidden');
+                } else {
+                    passwordError.classList.remove('hidden');
+                    passwordSuccess.classList.add('hidden');
+                }
+            }
+
+            function validateForm() {
+                const nip = document.getElementById('nip').value;
+                const name = document.getElementById('name').value;
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('password_confirmation').value;
+                const role = document.getElementById('role').value;
+                
+                // Validate NIP
+                if (!nip || !/^\d{8}$/.test(nip)) {
+                    alert('NIP harus berupa 8 digit angka!');
+                    return false;
+                }
+                
+                // Validate name
+                if (!name || name.trim().length === 0) {
+                    alert('Nama lengkap harus diisi!');
+                    return false;
+                }
+                
+                // Validate password
+                if (!password || password.length < 6) {
+                    alert('Password minimal 6 karakter!');
+                    return false;
+                }
+                
+                // Validate password confirmation
+                if (password !== confirmPassword) {
+                    alert('Konfirmasi password tidak sama!');
+                    return false;
+                }
+                
+                // Validate role
+                if (!role) {
+                    alert('Silakan pilih role!');
+                    return false;
+                }
+                
+                return true;
             }
 
             function confirmAction(formButton, action) {
@@ -420,42 +539,6 @@
         </script>
 
         <style>
-
-            /* Ensure table cells don't force horizontal scroll on mobile */
-@media (max-width: 767px) {
-    .min-w-full {
-        min-width: 100% !important;
-    }
-
-    table th,
-    table td {
-        word-break: break-word;
-        white-space: normal !important;
-    }
-
-    /* Make sure long text wraps */
-    .truncate {
-        white-space: normal !important;
-        overflow: visible !important;
-        text-overflow: clip !important;
-    }
-
-    /* Adjust padding for better mobile fit */
-    .px-6 {
-        padding-left: 0.75rem !important;
-        padding-right: 0.75rem !important;
-    }
-
-    .py-4 {
-        padding-top: 0.75rem !important;
-        padding-bottom: 0.75rem !important;
-    }
-
-    /* Reduce font size slightly on mobile */
-    .text-sm {
-        font-size: 0.8125rem !important;
-    }
-}
             .animate-fade-in {
                 animation: fadeIn 0.3s ease-in-out;
             }
@@ -473,40 +556,56 @@
             }
 
             /* Ensure table cells don't force horizontal scroll on mobile */
-@media (max-width: 767px) {
-    .min-w-full {
-        min-width: 100% !important;
-    }
+            @media (max-width: 767px) {
+                .min-w-full {
+                    min-width: 100% !important;
+                }
 
-    table th,
-    table td {
-        word-break: break-word;
-        white-space: normal !important;
-    }
+                table th,
+                table td {
+                    word-break: break-word;
+                    white-space: normal !important;
+                }
 
-    /* Make sure long text wraps */
-    .truncate {
-        white-space: normal !important;
-        overflow: visible !important;
-        text-overflow: clip !important;
-    }
+                /* Make sure long text wraps */
+                .truncate {
+                    white-space: normal !important;
+                    overflow: visible !important;
+                    text-overflow: clip !important;
+                }
 
-    /* Adjust padding for better mobile fit */
-    .px-6 {
-        padding-left: 0.75rem !important;
-        padding-right: 0.75rem !important;
-    }
+                /* Adjust padding for better mobile fit */
+                .px-6 {
+                    padding-left: 0.75rem !important;
+                    padding-right: 0.75rem !important;
+                }
 
-    .py-4 {
-        padding-top: 0.75rem !important;
-        padding-bottom: 0.75rem !important;
-    }
+                .py-4 {
+                    padding-top: 0.75rem !important;
+                    padding-bottom: 0.75rem !important;
+                }
 
-    /* Reduce font size slightly on mobile */
-    .text-sm {
-        font-size: 0.8125rem !important;
-    }
-}
+                /* Reduce font size slightly on mobile */
+                .text-sm {
+                    font-size: 0.8125rem !important;
+                }
+            }
+
+            /* Input focus states for better UX */
+            #nip:focus {
+                border-color: #3B82F6;
+                box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            }
+
+            #nip.error {
+                border-color: #EF4444;
+                box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+            }
+
+            #nip.success {
+                border-color: #10B981;
+                box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+            }
         </style>
     @endpush
 @endsection
