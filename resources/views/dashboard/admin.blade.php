@@ -442,7 +442,7 @@
                     </form>
                 </div>
 
-                <!-- Mobile Card View -->
+                <!-- Mobile Card View with Expandable Details -->
                 <div class="md:hidden" id="mobileCardContainer">
                     <form id="bulk-form-mobile" method="POST" action="{{ route('admin.softfiles.bulk') }}">
                         @csrf
@@ -473,76 +473,102 @@
                                     <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ $file->title }}</h3>
                                 </div>
 
-                                <!-- Book Details -->
+                                <!-- Basic Info (Always Visible) -->
                                 <div class="space-y-3 mb-4">
-                                    <div class="grid grid-cols-1 gap-3">
-                                        <div class="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
-                                            <span class="text-sm font-medium text-gray-500">Pengarang</span>
-                                            <span class="text-sm text-gray-900">{{ $file->author ?? '-' }}</span>
-                                        </div>
-                                        <div class="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
-                                            <span class="text-sm font-medium text-gray-500">Penerbit</span>
-                                            <span class="text-sm text-gray-900">{{ $file->publisher ?? '-' }}</span>
-                                        </div>
-                                        <div class="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
-                                            <span class="text-sm font-medium text-gray-500">Tahun</span>
-                                            <span class="text-sm text-gray-900">
-                                                @if ($file->publication_year)
-                                                    <span class="px-2.5 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">{{ $file->publication_year }}</span>
-                                                @else
-                                                    -
-                                                @endif
-                                            </span>
-                                        </div>
-                                        <div class="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
-                                            <span class="text-sm font-medium text-gray-500">Edisi</span>
-                                            <span class="text-sm text-gray-900">
-                                                @if ($file->edition)
-                                                    <span class="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs">{{ $file->edition }}</span>
-                                                @else
-                                                    -
-                                                @endif
-                                            </span>
-                                        </div>
-                                        <div class="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
-                                            <span class="text-sm font-medium text-gray-500">Genre</span>
-                                            <span class="text-sm text-gray-900">
-                                                @if ($file->genre)
-                                                    <span class="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs">{{ $file->genre }}</span>
-                                                @else
-                                                    -
-                                                @endif
-                                            </span>
-                                        </div>
+                                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                                        <span class="text-sm font-medium text-gray-500">Pengarang</span>
+                                        <span class="text-sm text-gray-900">{{ $file->author ?? '-' }}</span>
+                                    </div>
+                                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                                        <span class="text-sm font-medium text-gray-500">Penerbit</span>
+                                        <span class="text-sm text-gray-900">{{ $file->publisher ?? '-' }}</span>
                                     </div>
                                 </div>
 
+                                <!-- Expandable Details Section -->
+                                <div id="details-{{ $file->id }}" class="hidden space-y-3 mb-4 border-t border-gray-100 pt-4">
+                                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                                        <span class="text-sm font-medium text-gray-500">Tahun Terbit</span>
+                                        <span class="text-sm text-gray-900">
+                                            @if ($file->publication_year)
+                                                <span class="px-2.5 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">{{ $file->publication_year }}</span>
+                                            @else
+                                                -
+                                            @endif
+                                        </span>
+                                    </div>
+                                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                                        <span class="text-sm font-medium text-gray-500">Edisi</span>
+                                        <span class="text-sm text-gray-900">
+                                            @if ($file->edition)
+                                                <span class="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs">{{ $file->edition }}</span>
+                                            @else
+                                                -
+                                            @endif
+                                        </span>
+                                    </div>
+                                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                                        <span class="text-sm font-medium text-gray-500">Genre</span>
+                                        <span class="text-sm text-gray-900">
+                                            @if ($file->genre)
+                                                <span class="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs">{{ $file->genre }}</span>
+                                            @else
+                                                -
+                                            @endif
+                                        </span>
+                                    </div>
+                                    @if ($file->file_path)
+                                        <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                                            <span class="text-sm font-medium text-gray-500">Tipe File</span>
+                                            <span class="text-sm text-gray-900">
+                                                <span class="px-2 py-1 bg-indigo-100 text-indigo-800 rounded-full text-xs">
+                                                    {{ strtoupper(pathinfo($file->file_path, PATHINFO_EXTENSION)) }}
+                                                </span>
+                                            </span>
+                                        </div>
+                                    @endif
+                                </div>
+
+                                <!-- Show More/Less Button -->
+                                <div class="mb-4">
+                                    <button type="button" onclick="toggleDetails('{{ $file->id }}')" 
+                                            class="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors">
+                                        <span id="toggle-text-{{ $file->id }}">Lihat Detail Lengkap</span>
+                                        <svg id="toggle-icon-{{ $file->id }}" xmlns="http://www.w3.org/2000/svg" 
+                                             class="h-4 w-4 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </button>
+                                </div>
+
                                 <!-- Action Buttons -->
-                                <div class="flex flex-col sm:flex-row gap-3">
-                                    <a href="{{ route('admin.softfiles.preview', ['id' => $file->id, 'token' => $file->preview_token]) }}"
-                                        class="inline-flex items-center justify-center px-4 py-2.5 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                        </svg>
-                                        Preview
-                                    </a>
-                                    <a href="{{ route('admin.softfiles.edit', $file->id) }}"
-                                        class="inline-flex items-center justify-center px-4 py-2.5 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                        </svg>
-                                        Edit
-                                    </a>
-                                    <form action="{{ route('admin.softfiles.destroy', $file->id) }}" method="POST" class="inline">
+                                <div class="flex flex-col gap-3">
+                                    <div class="flex gap-3">
+                                        <a href="{{ route('admin.softfiles.preview', ['id' => $file->id, 'token' => $file->preview_token]) }}"
+                                            class="flex-1 inline-flex items-center justify-center px-4 py-2.5 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                            </svg>
+                                            Preview
+                                        </a>
+                                        <a href="{{ route('admin.softfiles.edit', $file->id) }}"
+                                            class="flex-1 inline-flex items-center justify-center px-4 py-2.5 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                            </svg>
+                                            Edit
+                                        </a>
+                                    </div>
+                                    <form action="{{ route('admin.softfiles.destroy', $file->id) }}" method="POST" class="w-full">
                                         @csrf
                                         @method('DELETE')
                                         <button type="button" onclick="confirmDelete(this)"
-                                            class="inline-flex items-center justify-center px-4 py-2.5 text-sm font-medium bg-red-600 text-white rounded-lg hover:bg-red-700 focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-300">
+                                            class="w-full inline-flex items-center justify-center px-4 py-2.5 text-sm font-medium bg-red-600 text-white rounded-lg hover:bg-red-700 focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                             </svg>
-                                            Hapus
+                                            Hapus Buku
                                         </button>
                                     </form>
                                 </div>
@@ -625,6 +651,7 @@
                 }
             });
 
+            
             bulkDeleteBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 const checked = document.querySelectorAll('input.item-checkbox[name="ids[]"]:checked');
@@ -655,6 +682,25 @@
             // Initialize
             updateBulkUI();
         });
+
+        // Toggle details function for mobile view
+        function toggleDetails(fileId) {
+            const detailsElement = document.getElementById(`details-${fileId}`);
+            const toggleText = document.getElementById(`toggle-text-${fileId}`);
+            const toggleIcon = document.getElementById(`toggle-icon-${fileId}`);
+            
+            if (detailsElement.classList.contains('hidden')) {
+                // Show details
+                detailsElement.classList.remove('hidden');
+                toggleText.textContent = 'Sembunyikan Detail';
+                toggleIcon.style.transform = 'rotate(180deg)';
+            } else {
+                // Hide details
+                detailsElement.classList.add('hidden');
+                toggleText.textContent = 'Lihat Detail Lengkap';
+                toggleIcon.style.transform = 'rotate(0deg)';
+            }
+        }
 
         function confirmDelete(formButton) {
             if (confirm('Yakin ingin menghapus buku ini?')) {
@@ -742,6 +788,21 @@
 
         ::-webkit-scrollbar-thumb:hover {
             background: #a1a1a1;
+        }
+
+        /* Smooth transitions for mobile expand/collapse */
+        #details-[id] {
+            transition: all 0.3s ease-in-out;
+        }
+
+        /* Enhanced mobile card styling */
+        .md\:hidden .inline-flex {
+            transition: all 0.2s ease-in-out;
+        }
+
+        .md\:hidden .inline-flex:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
     </style>
 @endpush

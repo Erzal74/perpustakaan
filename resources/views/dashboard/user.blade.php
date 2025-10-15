@@ -314,10 +314,11 @@
                     </table>
                 </div>
 
-                <!-- Mobile Card View -->
+                <!-- Mobile Card View with Show All Toggle -->
                 <div class="md:hidden" id="mobileCardContainer">
                     @forelse ($files as $file)
-                        <div class="p-6 border-b border-gray-200 last:border-b-0">
+                        <div class="p-6 border-b border-gray-200 last:border-b-0 mobile-card" data-card-id="{{ $file->id }}">
+                            <!-- File Type and New Badge -->
                             <div class="flex items-start gap-4 mb-4">
                                 <span
                                     class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
@@ -337,9 +338,13 @@
                                     </span>
                                 @endif
                             </div>
+
+                            <!-- Title -->
                             <div class="mb-4">
                                 <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ $file->title }}</h3>
                             </div>
+
+                            <!-- Basic Info (Always Visible) -->
                             <div class="space-y-3 mb-4">
                                 <div class="grid grid-cols-1 gap-3">
                                     <div class="flex justify-between items-center">
@@ -350,6 +355,26 @@
                                         <span class="text-sm font-medium text-gray-500">Penerbit</span>
                                         <span class="text-sm text-gray-900">{{ $file->publisher ?? '-' }}</span>
                                     </div>
+                                </div>
+                            </div>
+
+                            <!-- Show All Toggle Button -->
+                            <div class="mb-4">
+                                <button 
+                                    type="button" 
+                                    onclick="toggleDetails({{ $file->id }})"
+                                    class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-all duration-300 toggle-btn" 
+                                    data-card-id="{{ $file->id }}">
+                                    <span class="toggle-text">Show All</span>
+                                    <svg class="w-4 h-4 transition-transform duration-300 toggle-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <!-- Detailed Info (Hidden by default) -->
+                            <div class="space-y-3 mb-4 detail-info hidden" data-card-id="{{ $file->id }}">
+                                <div class="grid grid-cols-1 gap-3">
                                     <div class="flex justify-between items-center">
                                         <span class="text-sm font-medium text-gray-500">Tahun</span>
                                         <span class="text-sm text-gray-900">
@@ -380,6 +405,8 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Action Buttons -->
                             <div class="flex flex-col sm:flex-row gap-3">
                                 <a href="{{ route('user.preview', ['id' => $file->id, 'token' => $file->preview_token]) }}"
                                     class="inline-flex items-center justify-center px-4 py-2.5 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300">
@@ -437,6 +464,29 @@
             const searchInput = document.getElementById('searchInput');
             const tableBody = document.getElementById('softfileTable');
             const mobileCardContainer = document.getElementById('mobileCardContainer');
+
+            // Toggle Details Function for Mobile Cards
+            function toggleDetails(cardId) {
+                const detailInfo = document.querySelector(`[data-card-id="${cardId}"].detail-info`);
+                const toggleBtn = document.querySelector(`[data-card-id="${cardId}"].toggle-btn`);
+                const toggleText = toggleBtn.querySelector('.toggle-text');
+                const toggleIcon = toggleBtn.querySelector('.toggle-icon');
+                
+                if (detailInfo.classList.contains('hidden')) {
+                    // Show details
+                    detailInfo.classList.remove('hidden');
+                    toggleText.textContent = 'Show Less';
+                    toggleIcon.style.transform = 'rotate(180deg)';
+                } else {
+                    // Hide details
+                    detailInfo.classList.add('hidden');
+                    toggleText.textContent = 'Show All';
+                    toggleIcon.style.transform = 'rotate(0deg)';
+                }
+            }
+
+            // Make toggleDetails available globally
+            window.toggleDetails = toggleDetails;
 
             // AJAX Live Search
             searchInput.addEventListener('input', function() {
@@ -604,9 +654,9 @@
                                 </tr>
                             `;
 
-                            // Mobile card
+                            // Mobile card with toggle functionality
                             const mobileCard = `
-                                <div class="p-6 border-b border-gray-200 last:border-b-0">
+                                <div class="p-6 border-b border-gray-200 last:border-b-0 mobile-card" data-card-id="${item.id}">
                                     <div class="flex items-start gap-4 mb-4">
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${fileBadgeClass}">
                                             ${item.file_extension.toUpperCase()}
@@ -626,6 +676,22 @@
                                                 <span class="text-sm font-medium text-gray-500">Penerbit</span>
                                                 <span class="text-sm text-gray-900">${item.publisher ?? '-'}</span>
                                             </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-4">
+                                        <button 
+                                            type="button" 
+                                            onclick="toggleDetails(${item.id})"
+                                            class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-all duration-300 toggle-btn" 
+                                            data-card-id="${item.id}">
+                                            <span class="toggle-text">Show All</span>
+                                            <svg class="w-4 h-4 transition-transform duration-300 toggle-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <div class="space-y-3 mb-4 detail-info hidden" data-card-id="${item.id}">
+                                        <div class="grid grid-cols-1 gap-3">
                                             <div class="flex justify-between items-center">
                                                 <span class="text-sm font-medium text-gray-500">Tahun</span>
                                                 <span class="text-sm text-gray-900">
@@ -727,6 +793,21 @@
                 justify-content: center;
             }
 
+            /* Toggle button hover effects */
+            .toggle-btn:hover {
+                background-color: #eff6ff;
+            }
+
+            /* Smooth transitions for toggle icon */
+            .toggle-icon {
+                transition: transform 0.3s ease;
+            }
+
+            /* Hidden state for details */
+            .detail-info.hidden {
+                display: none;
+            }
+
             /* Custom pagination styling */
             .pagination-wrapper .pagination {
                 @apply flex items-center space-x-1;
@@ -793,6 +874,15 @@
                 .pagination-wrapper .pagination li a,
                 .pagination-wrapper .pagination li span {
                     @apply px-2 py-1 text-xs;
+                }
+
+                /* Mobile card enhancements */
+                .mobile-card {
+                    transition: all 0.3s ease;
+                }
+
+                .mobile-card:hover {
+                    background-color: #f9fafb;
                 }
             }
         </style>

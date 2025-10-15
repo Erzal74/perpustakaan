@@ -68,7 +68,7 @@ class UserController extends Controller
             }
         })
         ->orderBy($sort, $direction)
-        ->paginate(5)
+        ->paginate(20)
         ->withQueryString();
 
         /** @var \App\Models\User|null $user */
